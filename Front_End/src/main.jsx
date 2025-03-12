@@ -10,22 +10,28 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-  },
-  {
-    path: "/product-detail",
-    element: <ProductDetail />,
-  },
-  {
-    path: "/cart",
-    element: <Cart />,
-  },
-  {
-    path: "/payment",
-    element: <Payment />,
-  },
-  {
-    path: "/search",
-    element: <Search />,
+    children: [
+      {
+        index: true,
+        element: <>Hello my friend</>, // Đây là in giá trị mặc định vào Home
+      },
+      {
+        path: "/product-detail",
+        element: <ProductDetail />,
+      },
+      {
+        path: "/cart",
+        element: <Cart />,
+      },
+      {
+        path: "/payment",
+        element: <Payment />,
+      },
+      {
+        path: "/search",
+        element: <Search />,
+      },
+    ],
   },
 ]);
 
