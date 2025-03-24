@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <>Hello my friend</>, // Đây là in giá trị mặc định vào Home
+        element: <>Hello my friend</>,  
       },
       {
         path: "/product-detail",
