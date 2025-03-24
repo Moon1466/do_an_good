@@ -1,7 +1,9 @@
 const express = require('express')
+const { hostname } = require('os')
 const path = require('path')
 const app = express()
-const port = 3000
+const port = process.env || 3000
+const hostname = "localhost"
 
 // USE TE
 
@@ -14,6 +16,6 @@ app.get('/', (req, res) => {
   res.render('index.ejs')
 })
 
-app.listen(port, () => {
+app.listen(port, hostname,  () => {
   console.log(`Example app listening on port ${port}`)
 })
