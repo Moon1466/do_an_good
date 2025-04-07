@@ -1,0 +1,112 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  background: #e8edf5;
+}
+
+li {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.dashboard__inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.dashboard-sidebar {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  bottom: 0px;
+  z-index: 1006;
+  transform: translateX(0%);
+  margin: 20px 0 0 20px;
+  width: 270px;
+  height: calc(100% - 40px);
+  background: #fff;
+  color: #000;
+  border-radius: 18px;
+}
+.dashboard-sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  width: 100%;
+}
+.dashboard-sidebar__img {
+  margin: 0 auto;
+  width: 178px;
+  height: 80px;
+}
+.dashboard-sidebar__body {
+  padding: 16px;
+  margin-top: 32px;
+}
+.dashboard-sidebar__item {
+  padding: 5px 0;
+  margin-bottom: 2px;
+}
+.dashboard-sidebar__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+.dashboard-sidebar__link:before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  content: "";
+  height: 100%;
+  transition: all 0.4s ease-in-out;
+  z-index: 1;
+  border-radius: 0;
+  left: -16px;
+  width: 0;
+}
+.dashboard-sidebar__link:hover:before {
+  width: calc(100% + 16px);
+  border-radius: 0 24px 24px 0;
+  background: rgba(0, 133, 219, 0.122);
+}
+.dashboard-sidebar__link:hover .dashboard-sidebar__text {
+  color: #0085db;
+}
+.dashboard-sidebar__link:hover .dashboard-sidebar__icon {
+  filter: brightness(0) saturate(100%) invert(44%) sepia(75%) saturate(5583%) hue-rotate(184deg) brightness(98%) contrast(101%);
+}
+.dashboard-sidebar__icon {
+  margin-right: 14px;
+  width: 20px;
+  height: 20px;
+}
+.dashboard-sidebar__text {
+  font-size: 1.4rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  line-height: 1.1rem;
+}
+
+.container {
+  background-color: #f0f0f0;
+  color: white;
+}
+
+/*# sourceMappingURL=main.css.map */
