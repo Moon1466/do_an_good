@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="\css\main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+      rel="stylesheet" />
+    <title>Home</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <div class="container">
+        <div class="dashboard__inner">
+          <!-- Sidebar -->
+          <div class="dashboard-sidebar">
+          <div class="dashboard-sidebar__wrapper">
+              <!-- Header -->
+              <div class="dashboard-sidebar__header">
+                <img src="images/logo/logo.svg" alt="" class="dashboard-sidebar__img" />
+              </div>
+              <!-- Body -->
+              <div class="dashboard-sidebar__body">
+                <ul class="dashboard-sidebar__list">
+                  <li class="dashboard-sidebar__item">
+                    <a href="/" class="dashboard-sidebar__link">
+                      <img src="images/icons/dashboard.svg" alt="" class="dashboard-sidebar__icon" />
+                      <span class="dashboard-sidebar__text">Dashboard</span>
+                    </a>
+                  </li>
+                  <li class="dashboard-sidebar__item">
+                    <a href="/product" class="dashboard-sidebar__link">
+                      <img src="images/icons/product.svg" alt="" class="dashboard-sidebar__icon" />
+                      <span class="dashboard-sidebar__text">Sản phẩm</span>
+                    </a>
+                  </li>
+                  <li class="dashboard-sidebar__item">
+                    <a href="/order" class="dashboard-sidebar__link">
+                      <img src="images/icons/order.svg" alt="" class="dashboard-sidebar__icon" />
+                      <span class="dashboard-sidebar__text">Thanh toán</span>
+                    </a>
+                  </li>
+                  <li class="dashboard-sidebar__item">
+                    <a href="/account" class="dashboard-sidebar__link">
+                      <img src="images/icons/account.svg" alt="" class="dashboard-sidebar__icon" />
+                      <span class="dashboard-sidebar__text">Tài khoản</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+          </div>
+          </div>
+          <!-- Content -->
+          <div class="dashboard__content">
+            <div class="product">
+             <div class="container">
+                <!-- Header -->
+                <div class="product__header">
+                  <!-- Search -->
+                  <div class="product__search">
+                    <form action="" class="product__search-form">
+                      <input type="text" class="product__search-input" placeholder="Tìm kiếm sản phẩm" />
+                      <button class="product__search-btn">
+                        <img src="images/icons/search.svg" alt="" class="product__search-icon" />
+                      </button>
+                    </form>
+                  </div>
+                  <!-- Action -->
+                  <div class="product__actions">
+                    <button class="product__act">
+                      <img src="images/icons/filter.svg" alt="" class="product__act-icon" />
+                      <span class="product__text">Lọc</span>
+                    </button>
+                    <button class="product__act">
+                      <img src="images/icons/add.svg" alt="" class="product__act-icon" />
+                      <span class="product__text">Thêm sản phẩm</span>
+                    </button>
+                  </div>
+                </div>
+             </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
