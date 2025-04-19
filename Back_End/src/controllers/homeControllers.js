@@ -14,6 +14,9 @@ const getAccount = (req, res) =>{
     res.render('account.ejs')
 }
 
+
+
+
 module.exports = {
     getHome, getProduct, getOrder, getAccount
 }

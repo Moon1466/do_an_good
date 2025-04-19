@@ -9,6 +9,9 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
       rel="stylesheet" />
+
+    <script src="vendor/ckeditor/ckeditor.js"></script>
+
     <title>Home</title>
   </head>
   <body>
@@ -17,7 +20,7 @@
         <div class="dashboard__inner">
           <!-- Sidebar -->
           <div class="dashboard-sidebar">
-          <div class="dashboard-sidebar__wrapper">
+            <div class="dashboard-sidebar__wrapper">
               <!-- Header -->
               <div class="dashboard-sidebar__header">
                 <img src="images/logo/logo.svg" alt="" class="dashboard-sidebar__img" />
@@ -51,12 +54,13 @@
                   </li>
                 </ul>
               </div>
-          </div>
+            </div>
           </div>
           <!-- Content -->
           <div class="dashboard__content">
+            <!-- Content -->
             <div class="product">
-             <div class="container">
+              <div class="container">
                 <!-- Header -->
                 <div class="product__header">
                   <!-- Search -->
@@ -74,17 +78,129 @@
                       <img src="images/icons/filter.svg" alt="" class="product__act-icon" />
                       <span class="product__text">Lọc</span>
                     </button>
-                    <button class="product__act">
+                    <button class="product__act" id="addProduct">
                       <img src="images/icons/add.svg" alt="" class="product__act-icon" />
                       <span class="product__text">Thêm sản phẩm</span>
                     </button>
                   </div>
                 </div>
-             </div>
+                <!-- Body -->
+                <div class="product__main">
+                  <!-- Header -->
+                  <div class="product__header-main">
+                    <div class="product__label">Tên sản phẩm</div>
+                    <div class="product__label">Giá</div>
+                    <div class="product__label">Tồn kho</div>
+                    <div class="product__label">Trạng thái</div>
+                    <div class="product__label">Thao tác</div>
+                  </div>
+                  <!-- Body -->
+                  <div class="product__body-main">
+                    <div class="product__image">
+                      <img src="images/products/book6.jpg" alt="" class="product__img" />
+                    </div>
+                    <div class="product__name">I am Apple</div>
+                    <div class="product__price">200.000 đ</div>
+                    <div class="product__stock">100</div>
+                    <div class="product__status">
+                      <div class="product__selected">Inactive</div>
+                      <div class="product__select-box">
+                        <div class="product__option-container">
+                          <div class="product__option">
+                            <input type="radio" id="active" />
+                            <label for="active">Active</label>
+                          </div>
+                          <div class="product__option">
+                            <input type="radio" id="inactive" />
+                            <label for="inactive">Inactive</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="product__action">
+                      <button class="product__btn">
+                        <img src="images/icons/edit.svg" alt="" class="product__btn-icon" />
+                        <span>Edit</span>
+                      </button>
+                      <button id="addProduct" class="product__btn">
+                        <img src="images/icons/delete.svg" alt="" class="product__btn-icon" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+            <!-- Modal -->
+
+            <div class="modal" id="modal_addProduct">
+              <div class="modal__content">
+                <div class="modal__header">
+                  <h2 class="modal__title">Thêm sản phẩm</h2>
+                  <button class="modal__close" id="closeModal">
+                    <img src="images/icons/close.svg" alt="" class="modal__close-icon" id="closeModalButton" />
+                  </button>
+                </div>
+                <form action="" class="modal__form">
+                  <div class="modal__group">
+                    <label for="" class="modal__label">Hình ảnh</label>
+                    <input type="file" class="modal__input" placeholder="Nhập tên sản phẩm" />
+                  </div>
+                  <div class="modal__group">
+                    <label for="" class="modal__label">Hình ảnh phụ</label>
+                    <input type="file" class="modal__input" multiple placeholder="Nhập tên sản phẩm" />
+
+                  </div>
+                  <div class="modal__group">
+                    <label for="" class="modal__label">Tên sản phẩm</label>
+                    <input type="text" class="modal__input" placeholder="Nhập tên sản phẩm" />
+                  </div>
+                  <div class="modal__group">
+                    <label for="" class="modal__label">Giá</label>
+                    <input type="text" class="modal__input" placeholder="Nhập giá sản phẩm" />
+                  </div>
+                  <div class="modal__group">
+                    <label for="" class="modal__label">Tồn kho</label>
+                    <input type="text" class="modal__input" placeholder="Nhập số lượng tồn kho" />
+                  </div>
+
+                  <div class="modal__separator"></div>
+
+                  <h3 class="modal__heading">Thông tin</h3>
+                  <div class="modal__product-info">
+                    <div class="modal__group">
+                      <label for="" class="modal__label">Nhà cung cấp</label>
+                      <input type="text" class="modal__input" placeholder="Nhập nhà cung cấp" />
+                    </div>
+                    <div class="modal__group">
+                      <label for="" class="modal__label">Nhà xuất bản</label>
+                      <input type="text" class="modal__input" placeholder="Nhập nhà xuất bản" />
+                    </div>
+                    <div class="modal__group">
+                      <label for="" class="modal__label">Hình thức</label>
+                      <input type="text" class="modal__input" placeholder="Nhập hình thức" />
+                    </div>
+                    <div class="modal__group">
+                      <label for="" class="modal__label">Tác giả</label>
+                      <input type="text" class="modal__input" placeholder="Nhập tác giả" />
+                    </div>
+                  </div>
+                  <div class="modal__group">
+                    <label for="" class="modal__label">Mô tả</label>
+                    <textarea name="" id="description"></textarea>
+                  </div>
+                  <div class="modal__send">
+                    <button type="submit" class="btn modal__submit btn--primary">Thêm sản phẩm</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="modal__overlay" id="overlay"></div>
           </div>
         </div>
       </div>
     </div>
+
+    <script src="js/activeStatus.js"></script>
+    <script src="js/addProduct.js"></script>
   </body>
 </html>
