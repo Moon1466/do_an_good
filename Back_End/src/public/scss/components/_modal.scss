@@ -1,0 +1,387 @@
+.modal {
+  // display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  padding: 20px;
+  
+    width: 1000px;
+    height: 750px;
+
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.25);  
+
+  &--small {
+    width: 250px;
+    height: 250px;
+
+    &-horizontal {
+      width: 500px;
+      height: 250px;
+      z-index: 4;
+    }
+  }
+  
+  &--medium {
+    width: 500px;
+    height: 375px;
+
+    z-index: 2;
+
+    &#editCategoryModal{
+      z-index: 3;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  &__close-icon {
+    border: 1px solid #e8edf5;
+    border-radius: 50%;
+    background: #dbdbdb;
+    width: 20px;
+    height: 20px;
+  }
+
+  &__form {
+    margin-top: 20px;
+  }
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    & label {
+      margin-bottom: 8px;
+      font-size: 1.4rem;
+      font-weight: 500;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    & input {
+      border: 1px solid #e8edf5;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 1.4rem;
+    }
+
+    & + & {
+      margin-top: 20px;
+    }
+  }
+
+  &__separator {
+    position: relative;
+    margin: 20px 0;
+
+    border: 1px solid #757575;
+
+    &::after {
+      content: url(../images/icons/moon.svg);
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 0 10px;
+    }
+  }
+
+  &__heading {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  &__desc {
+    margin-top: 8px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  &__product-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 25px;
+
+    margin-top: 20px;
+    padding: 16px 0;
+  }
+
+  &__product-info &__group {
+    margin-top: 0;
+    margin-bottom: 20px;
+
+    width: 45%;
+  }
+
+  &__send {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+
+    margin-top: 16px;
+  }
+
+  &__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    padding: 2px;
+    border-radius: 8px;
+    background: rgba(0, 133, 219, 0.8);
+    border: rgba(0, 133, 219, 0.8) 1px solid;
+
+    width: 120px;
+    height: 40px;
+
+    color: #fff;
+
+    font-size: 1.4rem;
+    font-weight: 500;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  &__content {
+    position: relative;
+    flex-grow: 1;
+    & #closeModal,
+    & #closeDeleteModal,
+    & #closeViewModal,
+    & #closeEditModal {
+      position: absolute;
+      right: 0;
+      top: 0;
+      border: 1px solid #e8edf5;
+      border-radius: 50%;
+      background: #dbdbdb;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &__form-add-category {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 25px;
+
+    margin-top: 20px;
+    padding: 16px 0;
+  }
+
+  &__form-add-category .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0;
+    margin-bottom: 20px;
+
+    width: 45%;
+
+    & label {
+      margin-bottom: 16px;
+      font-size: 1.4rem;
+      font-weight: 500;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    & input {
+      border: 1px solid #e8edf5;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 1.4rem;
+    }
+  }
+
+  &__form-edit-category {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+
+    margin-top: 20px;
+    padding: 16px 0;
+
+    & .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-top: 0;
+      margin-bottom: 20px;
+
+      width: 45%;
+
+      & label {
+        margin-bottom: 16px;
+        font-size: 1.4rem;
+        font-weight: 500;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      & input {
+        border: 1px solid #e8edf5;
+        border-radius: 8px;
+        padding: 16px;
+        font-size: 1.4rem;
+      }
+    }
+  }
+
+  &__action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+
+    margin-top: 16px;
+    width: 100%;
+  }
+
+  &-category {
+    margin-top: 16px;
+
+    &__header {
+      position: relative;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-top: 16px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #e8edf5;
+
+      &::after {
+        content: url(../images/icons/moon.svg);
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #fff;
+        padding: 0 10px;
+      }
+    }
+    &__heading {
+      font-size: 1.4rem;
+      font-weight: 700;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    &__quantity {
+      margin-top: 16px;
+      font-size: 1.2rem;
+      font-weight: 500;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    &__title {
+      font-size: 1.2rem;
+      font-weight: 500;
+      font-family: "Plus Jakarta Sans", sans-serif;
+
+      margin: 8px 0;
+    }
+
+    &__list {
+      margin-left: 16px;
+      font-size: 1.2rem;
+      font-weight: 500;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    &__item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding-bottom: 16px;
+
+      border-bottom: 1px solid #e8edf5;
+
+      & span {
+        font-size: 1.2rem;
+        font-weight: 500;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      & + & {
+        margin-top: 32px;
+      }
+      &::after {
+        content: url(../images/icons/moon.svg);
+        position: absolute;
+        bottom: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #fff;
+        padding: 0 10px;
+      }
+    }
+
+    #viewSubCategoriesList &__item:last-child {
+      border-bottom: none;
+      .modal--medium {
+        z-index: 3;
+      }
+    }
+
+   #viewSubCategoriesList &__item:last-child::after {
+      display: none;
+    }
+
+    &__act, &__actions{
+      display: flex;align-items: center;gap: 16px;
+    }
+  }
+}
+
+.form {
+  &__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    padding: 2px;
+    border-radius: 8px;
+    background: rgba(0, 133, 219, 0.8);
+    border: rgba(0, 133, 219, 0.8) 1px solid;
+
+    width: 120px;
+    height: 40px;
+
+    color: #fff;
+
+    font-size: 1.4rem;
+    font-weight: 500;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+}

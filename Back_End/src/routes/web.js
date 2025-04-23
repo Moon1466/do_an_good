@@ -3,7 +3,7 @@ const router = express.Router();
  const Category = require('../model/Categories');
 
 const {getHome, getProduct, getOrder, getAccount} = require('../controllers/homeControllers')
-const {getCategory, newCategory} = require('../controllers/categoryController')
+const {getCategory, newCategory, showCategory} = require('../controllers/categoryController')
 router.get('/', getHome)
 
 router.get('/product', getProduct)
@@ -23,26 +23,7 @@ router.get('/product/:slug', (req, res) => {
 }   )
 
 // Route hiển thị chi tiết danh mục
-router.get('/category/:slugPath', async (req, res) => {
-    try {
-      const slugPath = req.params.slugPath;
-  
-      // Tìm danh mục hiện tại
-      const cat = await Category.findOne({ fullSlug: slugPath });
-      if (!cat) {
-        return res.status(404).send('Category not found');
-      }
-  
-      // Tìm các danh mục con
-      const subCategories = await Category.find({ parent: cat._id }).sort('name');
-  
-      // Render giao diện với danh mục hiện tại và danh mục con
-      res.render('categoryDetail', { category: cat, subCategories });
-    } catch (err) {
-      console.error('Error fetching category:', err);
-      res.status(500).send('Internal Server Error');
-    }
-  });
+router.get('/category/:slugPath', showCategory );
   
 
 module.exports = router;

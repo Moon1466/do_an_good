@@ -575,16 +575,71 @@ input {
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
 }
 
+.btn {
+  width: 100px;
+  height: 32px;
+  border-radius: 8px;
+}
+.btn--danger {
+  background-color: #ff4d4f;
+  color: #fff;
+}
+.btn--save {
+  background-color: rgba(0, 133, 219, 0.8);
+  color: #000;
+}
+.btn--edit, .btn--edit-sub {
+  width: 50px;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+.btn--edit-parent img {
+  width: 20px;
+  height: 20px;
+}
+.btn--delete-sub img {
+  width: 20px;
+  height: 20px;
+}
+.btn--delete, .btn--delete-sub {
+  width: 50px;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  color: #fff;
+}
+.btn .icon {
+  width: 20px;
+  height: 20px;
+}
+
 .modal {
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 20px;
-  background: #fff;
   width: 1000px;
   height: 750px;
-  overflow: scroll;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.25);
+}
+.modal--small {
+  width: 250px;
+  height: 250px;
+}
+.modal--small-horizontal {
+  width: 500px;
+  height: 250px;
+  z-index: 4;
+}
+.modal--medium {
+  width: 500px;
+  height: 375px;
+  z-index: 2;
+}
+.modal--medium#editCategoryModal {
+  z-index: 3;
 }
 .modal__header {
   display: flex;
@@ -646,6 +701,12 @@ input {
   font-weight: 700;
   font-family: "Plus Jakarta Sans", sans-serif;
 }
+.modal__desc {
+  margin-top: 8px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
 .modal__product-info {
   display: flex;
   align-items: center;
@@ -667,6 +728,188 @@ input {
   margin-top: 16px;
 }
 .modal__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 2px;
+  border-radius: 8px;
+  background: rgba(0, 133, 219, 0.8);
+  border: rgba(0, 133, 219, 0.8) 1px solid;
+  width: 120px;
+  height: 40px;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.modal__content {
+  position: relative;
+  flex-grow: 1;
+}
+.modal__content #closeModal, .modal__content #closeDeleteModal, .modal__content #closeViewModal, .modal__content #closeEditModal {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 1px solid #e8edf5;
+  border-radius: 50%;
+  background: #dbdbdb;
+  width: 20px;
+  height: 20px;
+}
+.modal__form-add-category {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-top: 20px;
+  padding: 16px 0;
+}
+.modal__form-add-category .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  margin-bottom: 20px;
+  width: 45%;
+}
+.modal__form-add-category .form-group label {
+  margin-bottom: 16px;
+  font-size: 1.4rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.modal__form-add-category .form-group input {
+  border: 1px solid #e8edf5;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 1.4rem;
+}
+.modal__form-edit-category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 16px 0;
+}
+.modal__form-edit-category .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  margin-bottom: 20px;
+  width: 45%;
+}
+.modal__form-edit-category .form-group label {
+  margin-bottom: 16px;
+  font-size: 1.4rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.modal__form-edit-category .form-group input {
+  border: 1px solid #e8edf5;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 1.4rem;
+}
+.modal__action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+  width: 100%;
+}
+.modal-category {
+  margin-top: 16px;
+}
+.modal-category__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #e8edf5;
+}
+.modal-category__header::after {
+  content: url(../images/icons/moon.svg);
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 0 10px;
+}
+.modal-category__heading {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.modal-category__quantity {
+  margin-top: 16px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.modal-category__title {
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  margin: 8px 0;
+}
+.modal-category__list {
+  margin-left: 16px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.modal-category__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8edf5;
+}
+.modal-category__item span {
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.modal-category__item + .modal-category__item {
+  margin-top: 32px;
+}
+.modal-category__item::after {
+  content: url(../images/icons/moon.svg);
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 0 10px;
+}
+#viewSubCategoriesList .modal-category__item:last-child {
+  border-bottom: none;
+}
+#viewSubCategoriesList .modal-category__item:last-child .modal--medium {
+  z-index: 3;
+}
+#viewSubCategoriesList .modal-category__item:last-child::after {
+  display: none;
+}
+.modal-category__act, .modal-category__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.form__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.form__btn {
   display: flex;
   align-items: center;
   justify-content: center;
