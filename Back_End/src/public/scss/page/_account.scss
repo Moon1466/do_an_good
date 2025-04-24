@@ -1,0 +1,85 @@
+.account {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    padding: 0 20px;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50%;
+  }
+
+  &__search-form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    height: 100%;
+    width: 250px;
+    background: #e8edf5;
+    border: #e8edf5 1px solid;
+    border-radius: 8px;
+  }
+
+  &__search-input {
+    background: #e8edf5;
+    width: 85%;
+  }
+
+  &__search-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  &__act {
+    padding: 20px;
+    border-radius: 8px;
+
+    &:first-child {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #e8edf5;
+      border: #e8edf5 1px solid;
+      padding: 2px;
+      width: 80px;
+      height: 40px;
+    }
+
+    &:last-child {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 40px;
+      color: #fff;
+      background: rgb(0, 133, 219);
+    }
+  }
+
+  &__act-icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  &__text {
+    font-size: 1.4rem;
+    font-weight: 500;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+}

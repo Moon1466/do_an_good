@@ -16,8 +16,6 @@ const getCategory = async (req, res) => {
       })
     );
 
-    console.log("Categories with subcategories count:", categoriesWithSubCount); // Log để kiểm tra
-
     res.render('category', { categories: categoriesWithSubCount });
   } catch (err) {
     console.error('Lỗi fetch categories:', err);

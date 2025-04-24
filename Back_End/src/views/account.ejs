@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="\css\main.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
-      rel="stylesheet" />
-    <title>Home</title>
-  </head>
-  <body>
-    <div class="dashboard">
-      <div class="container">
-        <div class="dashboard__inner">
-          <!-- Sidebar -->
-          <div class="dashboard-sidebar">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="\css\main.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
+
+  <script src="vendor/ckeditor/ckeditor.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <title>Home</title>
+</head>
+
+<body>
+  <div class="dashboard">
+    <div class="container">
+      <div class="dashboard__inner">
+        <!-- Sidebar -->
+        <div class="dashboard-sidebar">
+          <div class="dashboard-sidebar__wrapper">
             <!-- Header -->
             <div class="dashboard-sidebar__header">
               <img src="images/logo/logo.svg" alt="" class="dashboard-sidebar__img" />
@@ -37,6 +42,12 @@
                   </a>
                 </li>
                 <li class="dashboard-sidebar__item">
+                  <a href="/category" class="dashboard-sidebar__link">
+                    <img src="/images/icons/category.svg" alt="" class="dashboard-sidebar__icon" />
+                    <span class="dashboard-sidebar__text">Danh mục</span>
+                  </a>
+                </li>
+                <li class="dashboard-sidebar__item">
                   <a href="/order" class="dashboard-sidebar__link">
                     <img src="images/icons/order.svg" alt="" class="dashboard-sidebar__icon" />
                     <span class="dashboard-sidebar__text">Thanh toán</span>
@@ -51,12 +62,43 @@
               </ul>
             </div>
           </div>
-          <!-- Content -->
-          <div class="dashboard__content">
-            
-          </div>
         </div>
-      </div>
-    </div>
-  </body>
+        <!-- Content -->
+        <div class="dashboard__content">
+          <!-- Content -->
+          <div class="account">
+            <div class="container">
+              <!-- Header -->
+              <div class="account__header">
+                <!-- Search -->
+                <div class="account__search">
+                  <form action="/account" method="GET" class="account__search-form">
+                    <input type="text" name="search" class="account__search-input" placeholder="Tìm kiếm tài khoản" value="<%= locals.searchTerm || '' %>" />
+                    <button type="submit" class="account__search-btn">
+                      <img src="images/icons/search.svg" alt="" class="account__search-icon" />
+                    </button>
+                  </form>
+                </div>
+                <!-- Action -->
+                <div class="account__actions">
+                  <div class="account__filter">
+                    <button class="account__act" id="filterButton">
+                      <img src="images/icons/filter.svg" alt="" class="account__act-icon" />
+                      <span class="account__text">Lọc</span>
+                    </button>
+
+                  </div>
+                  <button class="account__act" id="addaccount">
+                    <img src="images/icons/add.svg" alt="" class="account__act-icon" />
+                    <span class="account__text">Thêm tài khoản</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Body -->
+
+            </div>
+          </div>
+
+</body>
+
 </html>

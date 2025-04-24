@@ -6,19 +6,20 @@ const Category = require('../model/Categories'); // Đảm bảo đường dẫn
 const createCategory = async (req, res) => {
   try {
     const { name, parent } = req.body;
+    const newCategory = new Category({ name, parent: parent || null });
+    await newCategory.save();
 
-    // Kiểm tra nếu parent không hợp lệ
-    if (parent && !mongoose.Types.ObjectId.isValid(parent)) {
-      return res.status(400).json({ message: "Parent ID không hợp lệ" });
+    // Nếu có parent, cập nhật subCategories cho cha
+    if (parent) {
+      await Category.findByIdAndUpdate(
+        parent,
+        { $push: { subCategories: newCategory._id } }
+      );
     }
 
-    const cat = new Category({ name, parent: parent || null });
-    await cat.validate(); // Kiểm tra lỗi trước khi lưu
-    await cat.save();
-    res.status(201).json(cat);
+    res.status(201).json({ message: 'Thêm danh mục thành công', category: newCategory });
   } catch (err) {
-    console.error("Error creating category:", err);
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ message: 'Lỗi khi thêm danh mục', error: err.message });
   }
 };
 
