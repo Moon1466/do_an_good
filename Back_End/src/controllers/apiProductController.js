@@ -8,15 +8,60 @@ const Category = require('../model/Categories');
 const createProduct = async (req, res) => {
   try {
     const { name, price, stock, supplier, publisher, type, author, description, category } = req.body;
-    // Xử lý file ảnh nếu có (req.files)
-    const images = []; // Xử lý thêm nếu dùng upload ảnh
-    const subImages = [];
+
+    // Kiểm tra các trường bắt buộc
+    if (!name || !price || !stock || !category) {
+      return res.status(400).json({ message: 'Vui lòng điền đầy đủ thông tin bắt buộc' });
+    }
+
+    // Kiểm tra giá và số lượng hợp lệ
+    if (price <= 0 || stock < 0) {
+      return res.status(400).json({ message: 'Giá và số lượng phải lớn hơn 0' });
+    }
+
+    // Kiểm tra sản phẩm đã tồn tại chưa
+    const existingProduct = await Product.findOne({ name });
+    if (existingProduct) {
+      return res.status(400).json({ message: 'Sản phẩm đã tồn tại' });
+    }
+
+    // Kiểm tra category có tồn tại không
+    const categoryExists = await Category.findById(category);
+    if (!categoryExists) {
+      return res.status(400).json({ message: 'Danh mục không tồn tại' });
+    }
+
+    // Xử lý upload ảnh
+    let images = [];
+    let subImages = [];
+    
+    if (req.files) {
+      if (req.files.mainImage) {
+        images = [req.files.mainImage[0].path];
+      }
+      if (req.files.subImages) {
+        subImages = req.files.subImages.map(file => file.path);
+      }
+    }
+
     const product = new Product({
-      name, price, stock, supplier, publisher, type, author, description, category, images, subImages
+      name,
+      price,
+      stock,
+      supplier,
+      publisher,
+      type,
+      author,
+      description,
+      category,
+      images,
+      subImages
     });
+
     await product.save();
     res.status(201).json({ message: 'Thêm sản phẩm thành công', product });
   } catch (err) {
+    console.error('Error creating product:', err);
     res.status(500).json({ message: 'Lỗi khi thêm sản phẩm', error: err.message });
   }
 };
@@ -353,5 +398,5 @@ const deleteSubImage = async (req, res) => {
 };
 
 module.exports = {
-  createProduct, addProduct, getAllProducts, getProductById, updateProductStatus, deleteProduct, updateProduct, deleteSubImage
+  createProduct, addProduct, getAllProducts, getProductById, updateProductStatus, deleteProduct, updateProduct, deleteSubImage,
 };

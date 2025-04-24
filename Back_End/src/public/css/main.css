@@ -762,6 +762,317 @@ select {
   font-family: "Plus Jakarta Sans", sans-serif;
 }
 
+.account__main {
+  margin-top: 16px;
+}
+
+.account__header-main {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+  height: 80px;
+  padding: 0 20px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.account__label {
+  font-size: 1.4rem;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  line-height: 1.1rem;
+  text-align: center;
+}
+
+.account__label:first-child {
+  flex-basis: 15%;
+}
+
+.account__label:nth-child(2) {
+  flex-basis: 25%;
+}
+
+.account__label:nth-child(3) {
+  flex-basis: 25%;
+}
+
+.account__label:nth-child(4) {
+  flex-basis: 20%;
+}
+
+.account__label:nth-child(5) {
+  flex-basis: 15%;
+}
+
+.account__empty {
+  margin-top: 16px;
+  text-align: center;
+  padding: 40px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.account__empty img {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+}
+
+.account__empty p {
+  color: #666;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.account__modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.account__modal.show {
+  display: flex;
+}
+
+.account .modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.account .modal.show {
+  display: flex;
+}
+
+.account .modal__content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+}
+
+.account .modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.account .modal__title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.account .modal__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.account .modal__close:hover {
+  opacity: 0.8;
+}
+
+.account .modal__close-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.account .modal__subtitle {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #333;
+  margin: 16px 0;
+}
+
+.account .modal__form-add-account .modal__group-avatar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.account .modal__form-add-account .modal__group-avatar .modal__group-avatar-input {
+  flex: 1;
+}
+
+.account .modal__form-add-account .modal__group-avatar .preview-wrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+}
+
+.account .modal__form-add-account .modal__group-avatar .preview-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.account .modal__form-add-account .modal__account-info {
+  width: 500px;
+  height: 500px;
+}
+
+.account .modal__label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.account .modal__input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1.4rem;
+}
+
+.account .modal__input:focus {
+  outline: none;
+  border-color: #0085db;
+}
+
+.account .modal__account-info {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.account .modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.account .modal__submit {
+  background: #0085db;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1.4rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.account .modal__submit:hover {
+  background: rgb(0, 102.0273972603, 168);
+}
+
+.account__main {
+  background: #fff;
+}
+
+.account__list {
+  padding: 16px 16px;
+}
+
+.account__item {
+  display: flex;
+  align-items: center;
+  padding: 25px 0;
+}
+
+.account__avatar {
+  flex-basis: 15%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.account__avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.account__username {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  text-align: center;
+  flex-basis: 25%;
+}
+
+.account__password {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  text-align: center;
+  flex-basis: 25%;
+}
+
+.account__role {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  text-align: center;
+  flex-basis: 20%;
+}
+
+.account__actions {
+  flex-basis: 15%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.account__edit-btn {
+  border: 1px solid #d4d4d4;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  width: 40px;
+  height: 40px;
+}
+
+.account__edit-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+.account__delete-btn {
+  border: 1px solid #dcdcdc;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  width: 40px;
+  height: 40px;
+}
+
+.account__delete-btn img {
+  width: 20px;
+  height: 20px;
+}
+
 .btn {
   width: 100px;
   height: 32px;
@@ -825,6 +1136,10 @@ select {
   width: 500px;
   height: 375px;
   z-index: 2;
+}
+.modal--medium-horizontal {
+  width: 750px;
+  height: 500px;
 }
 .modal--medium#editCategoryModal {
   z-index: 3;
@@ -1219,6 +1534,38 @@ select {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+.modal__account {
+  overflow-y: scroll;
+}
+.modal__form-add-account .modal__group-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.modal__form-add-account .modal__group-avatar img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+.modal__account-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.modal__account-info .modal__group {
+  width: 45%;
+  margin-bottom: 16px;
+}
+.modal__account-info .modal__group + .modal__group {
+  margin-top: 0px;
+}
+.modal__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .form__action {

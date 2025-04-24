@@ -177,6 +177,57 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+const newCategory = async (req, res) => {
+  try {
+    const allCats = await Category.find().sort('fullSlug');
+    // Luôn truyền error—khi không có lỗi thì null
+    res.render('newCategory', { allCats, error: null });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+};
+
+const showCategory = async (req, res) => {
+    try {
+      const slugPath = req.params.slugPath;
+  
+      // Tìm danh mục hiện tại
+      const cat = await Category.findOne({ fullSlug: slugPath });
+      if (!cat) {
+        return res.status(404).send('Category not found');
+      }
+  
+      // Tìm các danh mục con
+      const subCategories = await Category.find({ parent: cat._id }).sort('name');
+  
+      // Render giao diện với danh mục hiện tại và danh mục con
+      res.render('categoryDetail', { category: cat, subCategories });
+    } catch (err) {
+      console.error('Error fetching category:', err);
+      res.status(500).send('Internal Server Error');
+    }
+  }
+
+
+const getRootCategories = async (req, res) => {
+    try {
+      const categories = await Category.find({ parent: null }).lean();
+  
+      const categoriesWithSubCount = await Promise.all(
+        categories.map(async (cat) => {
+          const subCategoriesCount = await Category.countDocuments({ parent: cat._id });
+          return { ...cat, subCategoriesCount };
+        })
+      );
+  
+      res.status(200).json(categoriesWithSubCount);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+  
 module.exports = {
-  createCategory , getCategories , getCategoriesbySlugPath , getCategoryById , updatedCategory , deleteCategory
+  createCategory , getCategories , getCategoriesbySlugPath , getCategoryById , updatedCategory , deleteCategory, newCategory, showCategory, getRootCategories
 };

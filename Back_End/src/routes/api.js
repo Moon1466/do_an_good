@@ -3,11 +3,14 @@ const mongoose = require('mongoose');
 const routerAPI = express.Router();
 const Category = require('../model/Categories');
 const Product = require('../model/Products');
+const Account = require('../model/Accounts');
 const multer = require('multer');
 const upload = require('../config/multer');
  
 const { createCategory, getCategories, getCategoriesbySlugPath , getCategoryById, updatedCategory  , deleteCategory} = require('../controllers/apiCategoryController');
 const { addProduct , getAllProducts, getProductById, updateProductStatus, deleteProduct, updateProduct, deleteSubImage } = require('../controllers/apiProductController');
+const { createAccount, getAllAccounts, getAccountById, updateAccount, deleteAccount } = require('../controllers/apiAccountController');
+
 // ------------ Category ------------------- //
 
 routerAPI.post('/categories', createCategory); // Sử dụng createCategory từ controller
@@ -46,5 +49,12 @@ routerAPI.delete('/products/:id', deleteProduct);
 
 // Route xóa ảnh phụ của sản phẩm - đặt trước route get product để tránh xung đột
 routerAPI.delete('/products/:id/subimage/:index', deleteSubImage);
+
+// ------------ Account ------------------- //
+routerAPI.get('/accounts', getAllAccounts); // Lấy danh sách tài khoản
+routerAPI.get('/accounts/:id', getAccountById); // Lấy chi tiết tài khoản
+routerAPI.post('/account/create', upload.single('avatar'), createAccount); // Tạo tài khoản mới
+routerAPI.put('/accounts/:id', upload.single('avatar'), updateAccount); // Cập nhật tài khoản
+routerAPI.delete('/accounts/:id', deleteAccount); // Xóa tài khoản
 
 module.exports = routerAPI;
