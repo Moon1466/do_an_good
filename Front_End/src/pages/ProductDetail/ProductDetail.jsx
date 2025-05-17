@@ -1,7 +1,591 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
+import axios from "axios";
+import "./ProductDetail.scss";
+import Cookies from "js-cookie";
 
 const ProductDetail = () => {
-  return <div>ProductDetail</div>;
+  // Hỗ trợ cả id và slug
+  const { id, slug } = useParams();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [categoryBreadcrumbs, setCategoryBreadcrumbs] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [canReview, setCanReview] = useState(false);
+  const [loadingCheck, setLoadingCheck] = useState(true);
+
+  useEffect(() => {
+    console.log("ProductDetail useEffect - id:", id, "slug:", slug);
+    const fetchProduct = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        let response;
+        if (id) {
+          response = await axios.get(`/api/products/${id}`);
+        } else if (slug) {
+          response = await axios.get(`/api/products/slug/${slug}`);
+        } else {
+          setError("Không có id hoặc slug sản phẩm.");
+          setLoading(false);
+          return;
+        }
+        if (response.data && response.data.success && response.data.data) {
+          setProduct(response.data.data);
+          setCategoryBreadcrumbs(response.data.categoryBreadcrumbs || []);
+        } else {
+          setError("Không tìm thấy sản phẩm hoặc dữ liệu trả về không hợp lệ.");
+        }
+      } catch (error) {
+        setError("Lỗi khi lấy dữ liệu sản phẩm: " + (error.response?.data?.message || error.message));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+
+    // Kiểm tra đăng nhập
+    const userCookie = Cookies.get("user");
+    setIsLoggedIn(!!userCookie);
+
+    const checkCanReview = async () => {
+      console.log("checkCanReview called");
+      setLoadingCheck(true);
+      try {
+        const user = JSON.parse(Cookies.get("user"));
+        console.log("user in checkCanReview", user);
+        if (!user || !user.email) {
+          console.log("No user or user.email, cannot review");
+          setCanReview(false);
+          setLoadingCheck(false);
+          return;
+        }
+        // 1. Lấy tất cả đơn hàng (không filter userId)
+        const ordersRes = await axios.get(`/api/orders`);
+        const allOrders = ordersRes.data.data || [];
+        // 2. Lọc đơn hàng có email trùng với user
+        const orders = allOrders.filter((order) => order.customer && order.customer.email === user.email);
+        console.log("orders filtered by email", orders);
+        // 3. Kiểm tra có đơn hàng đã xác nhận và chứa sản phẩm này không
+        const hasPurchased = orders.some(
+          (order) => order.status === "Đã xác nhận" && order.products.some((p) => p.productId === id)
+        );
+        console.log("hasPurchased", hasPurchased, orders);
+        if (!hasPurchased) {
+          setCanReview(false);
+          setLoadingCheck(false);
+          return;
+        }
+        // 4. Lấy tất cả comment của sản phẩm
+        const commentsRes = await axios.get(`/api/comments/${id}`);
+        const comments = commentsRes.data.comments || [];
+        console.log("comments", comments);
+        // 5. Kiểm tra user đã từng bình luận chưa (theo email hoặc fullName)
+        const hasReviewed = comments.some((c) => c.userEmail === user.email || c.userName === user.fullName);
+        console.log("hasReviewed", hasReviewed, comments);
+        setCanReview(!hasReviewed);
+      } catch (e) {
+        console.log("Error in checkCanReview", e);
+        setCanReview(false);
+      }
+      setLoadingCheck(false);
+    };
+    checkCanReview();
+  }, [id, slug]);
+
+  // Hàm xử lý tăng số lượng
+  const handleIncrease = () => {
+    if (quantity < (product?.stock || 1)) {
+      setQuantity((prev) => prev + 1);
+    }
+  };
+
+  // Hàm xử lý giảm số lượng
+  const handleDecrease = () => {
+    if (quantity > 1) {
+      setQuantity((prev) => prev - 1);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    let user = null;
+    try {
+      user = JSON.parse(Cookies.get("user"));
+    } catch (e) {
+      alert("Không thể đọc thông tin người dùng. Vui lòng đăng nhập lại!");
+      return;
+    }
+    if (!user || !(user._id || user.username) || !(user.name || user.fullName) || !user.avatar) {
+      alert("Thiếu thông tin người dùng. Vui lòng đăng nhập lại!");
+      return;
+    }
+    const apiUrl = "/api/basket/add";
+    await axios.post(apiUrl, {
+      userId: user._id || user.username,
+      userName: user.name || user.fullName || user.username,
+      userAvatar: user.avatar,
+      productId: product._id,
+      productName: product.name,
+      productImage: product.images[0],
+      quantity,
+      price: product.price,
+    });
+    alert("Đã thêm vào giỏ hàng!");
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div style={{ color: "red" }}>{error}</div>;
+  if (!product) return <div>Product not found</div>;
+
+  // Breadcrumb chỉ có category là link, tên sản phẩm là text cuối
+  const breadcrumbItems = [
+    ...categoryBreadcrumbs.map((cat) => ({
+      name: cat.name,
+      path: `/category/${cat.slug}`,
+    })),
+    { name: product?.name },
+  ];
+
+  // Comment Section Component
+  const CommentSection = () => {
+    const [showModal, setShowModal] = useState(false);
+    const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState("");
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+      fetchReviews();
+    }, []);
+
+    const fetchReviews = async () => {
+      try {
+        const response = await axios.get(`/api/comments/${id}`);
+        if (response.data.success) {
+          setReviews(response.data.comments || []);
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+
+    const handleSubmitReview = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+        const user = JSON.parse(Cookies.get("user"));
+        console.log("User data:", user);
+
+        // Validate user data
+        if (!user || !user.email) {
+          alert("Vui lòng đăng nhập để gửi đánh giá!");
+          setLoading(false);
+          return;
+        }
+
+        // Validate review data
+        if (!rating || rating < 1 || rating > 5) {
+          alert("Vui lòng chọn số sao từ 1-5!");
+          setLoading(false);
+          return;
+        }
+
+        if (!comment || comment.trim().length === 0) {
+          alert("Vui lòng nhập nội dung đánh giá!");
+          setLoading(false);
+          return;
+        }
+
+        console.log("Review data:", {
+          userId: user.email,
+          rating,
+          comment,
+        });
+        const productIdToSend = product?._id || id;
+        if (!productIdToSend) {
+          alert("Không xác định được sản phẩm!");
+          setLoading(false);
+          return;
+        }
+        const response = await axios.post(
+          `/api/comments/${productIdToSend}`,
+          {
+            userId: user.email,
+            rating,
+            comment,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("token")}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          setShowModal(false);
+          setRating(0);
+          setComment("");
+          fetchReviews(); // Refresh reviews after submission
+        } else {
+          alert(response.data.message || "Không thể gửi bình luận");
+        }
+      } catch (error) {
+        alert(error.response?.data?.message || "Không thể gửi bình luận");
+        console.error("Error submitting review:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    return (
+      <section className="comment">
+        <div className="container">
+          <div className="comment__wrapper">
+            <div className="comment__heading">Đánh giá sản phẩm</div>
+            {/* Top */}
+            <div className="comment__top">
+              <div className="comment-rating">
+                <div className="comment-rating__score-detail">
+                  <div className="comment-rating__score">
+                    <span className="comment-rating__value">
+                      {reviews.length > 0
+                        ? (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1)
+                        : "0"}
+                    </span>
+                    <span className="comment-rating__max">/5</span>
+                  </div>
+                  <div className="comment-rating__stars">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <img key={i} src="/src/assets/images/icon/star.svg" alt="" className="pd-dt-info__rating-star" />
+                    ))}
+                  </div>
+                  <span className="comment-rating__count">({reviews.length} đánh giá)</span>
+                </div>
+                <div className="comment-rating__bars">
+                  {[5, 4, 3, 2, 1].map((star) => {
+                    const count = reviews.filter((r) => r.rating === star).length;
+                    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                    return (
+                      <div className="comment-rating__bar" key={star}>
+                        <span className="comment-rating__label">{star} sao</span>
+                        <div className="comment-rating__progress" style={{ width: `${percentage}%` }}></div>
+                        <span className="comment-rating__percentage">{percentage.toFixed(0)}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="comment-reviews">
+                {loadingCheck ? (
+                  <span>Đang kiểm tra quyền bình luận...</span>
+                ) : canReview ? (
+                  <button className="comment-reviews__btn" onClick={() => setShowModal(true)}>
+                    Viết bình luận
+                  </button>
+                ) : (
+                  <span className="comment-reviews__label">
+                    Bạn cần mua và nhận hàng thành công để bình luận, hoặc bạn đã bình luận sản phẩm này rồi.
+                  </span>
+                )}
+              </div>
+            </div>
+            {/* Body */}
+            <div className="comment__body">
+              {/* Tabs */}
+              <div className="comment__tabs">
+                <ul className="comment__list">
+                  <li className="comment__item comment__item--active">Mới nhất</li>
+                  <li className="comment__item">Yêu thích nhất</li>
+                </ul>
+              </div>
+              {/* Content */}
+              <div className="comment-content">
+                <ul className="comment-content__list">
+                  {reviews.map((review, idx) => (
+                    <li className="comment-content__item" key={idx}>
+                      <div className="comment-content__user">
+                        <span className="comment-content__name">{review.userName}</span>
+                        <span className="comment-content__date">
+                          {new Date(review.createdAt).toLocaleDateString("vi-VN")}
+                        </span>
+                      </div>
+                      <div className="comment-content__review">
+                        <div className="comment-content__rating">
+                          {[...Array(review.rating)].map((_, i) => (
+                            <img
+                              key={i}
+                              src="/src/assets/images/icon/star.svg"
+                              alt=""
+                              className="pd-dt-info__rating-star"
+                            />
+                          ))}
+                        </div>
+                        <div className="comment-content__cmt">{review.comment}</div>
+                        <div className="comment-content__act">
+                          <div className="comment-content__like">
+                            <img src="/assets/images/icon/like.svg" alt="" className="comment-content__icon" />
+                            <div className="comment-content__value">{review.likes || 0}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ReviewModal
+          showModal={showModal}
+          setShowModal={setShowModal}
+          rating={rating}
+          setRating={setRating}
+          comment={comment}
+          setComment={setComment}
+          handleSubmitReview={handleSubmitReview}
+          loading={loading}
+        />
+      </section>
+    );
+  };
+
+  // Tách ReviewModal ra ngoài CommentSection
+  const ReviewModal = ({
+    showModal,
+    setShowModal,
+    rating,
+    setRating,
+    comment,
+    setComment,
+    handleSubmitReview,
+    loading,
+  }) => {
+    if (!showModal) return null;
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Viết đánh giá sản phẩm</h3>
+            <button onClick={() => setShowModal(false)}>&times;</button>
+          </div>
+          <form onSubmit={handleSubmitReview}>
+            <div className="rating-input">
+              <label>Đánh giá của bạn:</label>
+              <div className="stars" style={{ display: "flex", gap: 4 }}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    style={{
+                      cursor: "pointer",
+                      fontSize: 28,
+                      color: rating >= star ? "#FFD700" : "#ccc",
+                      transition: "color 0.2s",
+                    }}
+                    onClick={() => setRating(star)}
+                    role="button"
+                    aria-label={`Đánh giá ${star} sao`}>
+                    ★
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="comment-input">
+              <label>Nhận xét của bạn:</label>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Chia sẻ cảm nhận của bạn về sản phẩm này..."
+                required
+                style={{ width: "100%", minHeight: 80, resize: "vertical" }}
+              />
+            </div>
+            <div className="modal-footer">
+              <button type="button" onClick={() => setShowModal(false)}>
+                Hủy
+              </button>
+              <button type="submit" disabled={loading || !rating || !comment}>
+                {loading ? "Đang gửi..." : "Gửi đánh giá"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      {/* Breadcrumb luôn hiển thị, nếu có dữ liệu category */}
+      {product && <Breadcrumb items={breadcrumbItems} />}
+      <div className="container">
+        <section className="pd-dt">
+          <form method="post" className="pd-dt__form">
+            <div className="pd-dt__essential">
+              {/* Left */}
+              <div className="pd-dt__media">
+                <div className="pd-dt__media-container">
+                  {/* Review */}
+                  <div className="pd-dt__product-image-img">
+                    <div className="pd-dt__container-primary">
+                      <img
+                        src={product?.images?.[0] || "/assets/images/book/combo-20102022001.webp"}
+                        alt={product?.name}
+                        className="pd-dt__img-primary"
+                        id="imgProduct"
+                      />
+                    </div>
+                    <ul className="pd-dt__img-list">
+                      {product?.subImages?.slice(0, 3).map((img, idx) => (
+                        <li className="pd-dt__img-item" key={idx}>
+                          <img src={img} alt={product?.name} className="pd-dt__img-sub" />
+                        </li>
+                      ))}
+                      {product?.subImages?.length > 4 && (
+                        <li className="pd-dt__img-item" key="more">
+                          <div className="pd-dt__img-more">+{product.subImages.length - 3}</div>
+                        </li>
+                      )}
+                      {product?.subImages?.length === 4 && (
+                        <li className="pd-dt__img-item" key={3}>
+                          <img src={product.subImages[3]} alt={product?.name} className="pd-dt__img-sub" />
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                  {/* BTN */}
+                  <div className="pd-dt__act">
+                    <button type="button" className="pd-dt__add-cart" onClick={handleAddToCart}>
+                      Thêm vào giỏ hàng
+                    </button>
+                    <a className="pd-dt__buy">Mua ngay</a>
+                  </div>
+                  {/* Policy */}
+                  <div className="pd-dt-policy">
+                    <h4 className="pd-dt-policy__title">Chính sách ưu đãi của ***</h4>
+                    {[1, 2, 3].map((i) => (
+                      <div className="pd-dt-policy__note" key={i}>
+                        <div className="pd-dt-policy__left">
+                          <img src="/assets/images/icon/ico_truck_v2.webp" alt="" className="pd-dt-policy__icon" />
+                          <span className="pd-dt-policy__bold">Thời gian giao hàng :</span>
+                        </div>
+                        <div className="pd-dt-policy__right">
+                          <span>Giao nhanh và uy tín</span>
+                          <img src="/assets/images/icon/arrow_right.svg" alt="" className="pd-dt-policy__arrow" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {/* Right */}
+              <div className="pd-dt__content">
+                {/* Info */}
+                <div className="pd-dt-info">
+                  {/* Heading */}
+                  <h2 className="pd-dt-info__heading" id="nameProduct">
+                    {product?.name}
+                  </h2>
+                  {/* Details */}
+                  <div className="pd-dt-info__details">
+                    <ul className="pd-dt-info__list">
+                      <li className="pd-dt-info__item">
+                        Nhà cung cấp: <span className="pd-dt-info__bold">{product?.supplier || "Đang cập nhật"}</span>
+                      </li>
+                      <li className="pd-dt-info__item">
+                        Nhà xuất bản: <span className="pd-dt-info__bold">{product?.publisher || "Đang cập nhật"}</span>
+                      </li>
+                      <li className="pd-dt-info__item">
+                        Tác giả: <span className="pd-dt-info__bold">{product?.author || "Đang cập nhật"}</span>
+                      </li>
+                      <li className="pd-dt-info__item">
+                        Thể loại: <span className="pd-dt-info__bold">{product?.type || "Đang cập nhật"}</span>
+                      </li>
+                    </ul>
+                  </div>
+                  {/* Rating */}
+                  <div className="pd-dt-info__rating">
+                    {/* Star */}
+                    <div className="pd-dt-info__rating-stars">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <img
+                          key={i}
+                          src="/src/assets/images/icon/star.svg"
+                          alt=""
+                          className="pd-dt-info__rating-star"
+                        />
+                      ))}
+                    </div>
+                    {/* Comment */}
+                    <span className="pd-dt-info__comment">(100 đánh giá)</span>
+                    {/* Quantity */}
+                    <div className="pd-dt-info__quantity">
+                      <p>Đã bán</p>
+                      <span className="pd-dt-info__quantity-sale">{product?.sold || 0}</span>
+                    </div>
+                  </div>
+                  {/* Price */}
+                  <div className="pd-dt-info__price">
+                    <div className="pd-dt-info__price-current" id="priceValue">
+                      {product?.price ? product.price.toLocaleString() + " đ" : "Đang cập nhật"}
+                    </div>
+                  </div>
+                </div>
+                {/* Quantity */}
+                <div className="pd-dt-qtt">
+                  <div className="pd-dt-qtt__span">Số lượng</div>
+                  <div className="pd-dt-qtt__act">
+                    <button
+                      type="button"
+                      className="pd-dt-qtt__click"
+                      onClick={handleDecrease}
+                      disabled={quantity <= 1}>
+                      <img
+                        src="/src/assets/images/icon/minus.webp"
+                        alt=""
+                        className="pd-dt-qtt__act-btn"
+                        style={{ height: "2px" }}
+                      />
+                    </button>
+                    <span className="pd-dt-qtt__number" id="productValue">
+                      {quantity}
+                    </span>
+                    <button
+                      type="button"
+                      className="pd-dt-qtt__click"
+                      onClick={handleIncrease}
+                      disabled={quantity >= (product?.stock || 1)}>
+                      <img src="/src/assets/images/icon/plus.webp" alt="" className="pd-dt-qtt__act-btn" />
+                    </button>
+                  </div>
+                </div>
+                {/* Details */}
+                <div className="pd-dt-detail">
+                  <h3 className="pd-dt-detail__title">Thông tin chi tiết</h3>
+                  <table className="pd-dt-detail__table">
+                    <colgroup>
+                      <col width="25%" />
+                      <col />
+                    </colgroup>
+                    <tbody>
+                      <tr>
+                        <th className="pd-dt-detail__heading">Mã hàng</th>
+                        <td>{product?._id}</td>
+                      </tr>
+                      {/* Thêm các dòng chi tiết khác nếu cần */}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
+      <CommentSection />
+    </div>
+  );
 };
 
 export default ProductDetail;

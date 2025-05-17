@@ -30,6 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const formData = new FormData(addCategoryForm);
       const data = Object.fromEntries(formData.entries());
 
+      // Kiểm tra và xử lý trường parent
+      if (!data.parent) {
+        delete data.parent; // Xóa trường parent nếu không có giá trị
+      }
+
       try {
         const response = await fetch("/api/categories", {
           method: "POST",

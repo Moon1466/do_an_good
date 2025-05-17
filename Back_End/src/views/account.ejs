@@ -99,7 +99,7 @@
                 <div class="account__header-main">
                   <div class="account__label">Ảnh đại diện</div>
                   <div class="account__label">Tên tài khoản</div>
-                  <div class="account__label">Mật khẩu</div>
+                  <div class="account__label">Thông tin</div>
                   <div class="account__label">Phân quyền</div>
                   <div class="account__label">Thao tác</div>
                 </div>
@@ -110,11 +110,29 @@
                     <% users.forEach(user => { %>
                     <li class="account__item">
                       <div class="account__avatar">
-                        <img src="/images/uploads/<%= user.avatar || 'default-avatar.png' %>" alt="Avatar" class="account__avatar-img">
+                        <img src="<%= user.avatar %>" alt="Avatar" class="account__avatar-img">
                       </div>
-                      <div class="account__username"><%= user.username %></div>
-                      <div class="account__password">********</div>
-                      <div class="account__role"><%= user.role %></div>
+                      <div class="account__username">
+                        <%= user.username %>
+                        <div class="account__email"><%= user.email %></div>
+                      </div>
+                      <div class="account__info">
+                        <div class="account__fullname"><%= user.fullName %></div>
+                        <div class="account__phone"><%= user.phone %></div>
+                        <div class="account__address">
+                          <% if (user.address) { %>
+                          <%= user.address.detail ? user.address.detail + ', ' : '' %>
+                          <%= user.address.ward %>,
+                          <%= user.address.district %>,
+                          <%= user.address.province %>
+                          <% } %>
+                        </div>
+                      </div>
+                      <div class="account__role">
+                        <span class="account__role-badge <%= user.role === 'admin' ? 'account__role-badge--admin' : '' %>">
+                          <%= user.role %>
+                        </span>
+                      </div>
                       <div class="account__actions">
                         <button class="account__edit-btn" data-id="<%= user._id %>">
                           <img src="/images/icons/edit.svg" alt="Edit" class="account__action-icon">
@@ -126,15 +144,19 @@
                     </li>
                     <% }); %>
                   </ul>
-                  <% } %>
+                  <% } else { %>
                   <!-- Empty State -->
-                  <% if (locals.users && users.length === 0) { %>
                   <div class="account__empty">
-                    <img src="images/icons/empty-box.svg" alt="No users">
-                    <div>Không tìm thấy tài khoản nào phù hợp với từ khóa "<%= searchTerm %>"</p>
+                    <img src="images/icons/user_not_found.png" alt="No users">
+                    <div class="account__empty-text">
+                      <% if (locals.searchTerm) { %>
+                      Không tìm thấy tài khoản nào phù hợp với từ khóa "<%= searchTerm %>"
+                      <% } else { %>
+                      Chưa có tài khoản nào
+                      <% } %>
                     </div>
-                    <% } %>
                   </div>
+                  <% } %>
                 </div>
               </div>
             </div>
@@ -173,17 +195,17 @@
 
             <div class="modal__group">
               <label class="modal__label">Email</label>
-              <input type="email" name="email" class="modal__input" required placeholder="Nhập email" />
+              <input type="email" name="email" class="modal__input" required placeholder="Nhập email" autocomplete="email" />
             </div>
 
             <div class="modal__group">
               <label class="modal__label">Mật khẩu</label>
-              <input type="password" name="password" class="modal__input" required placeholder="Nhập mật khẩu" />
+              <input type="password" name="password" class="modal__input" required placeholder="Nhập mật khẩu" autocomplete="new-password" />
             </div>
 
             <div class="modal__group">
               <label class="modal__label">Nhập lại mật khẩu</label>
-              <input type="password" name="confirmPassword" class="modal__input" required placeholder="Xác nhận mật khẩu" />
+              <input type="password" name="confirmPassword" class="modal__input" required placeholder="Xác nhận mật khẩu" autocomplete="new-password" />
             </div>
 
             <div class="modal__group">
@@ -197,6 +219,36 @@
             </div>
 
             <input type="hidden" name="role" value="admin" />
+          </div>
+
+          <div class="modal__separator"></div>
+          <h3 class="modal__heading">Thông tin địa chỉ</h3>
+          <div class="modal__address-info">
+            <div class="modal__group">
+              <label class="modal__label">Tỉnh/Thành phố</label>
+              <select name="address[province]" class="modal__input" required>
+                <option value="">Chọn Tỉnh/Thành phố</option>
+              </select>
+            </div>
+
+            <div class="modal__group">
+              <label class="modal__label">Quận/Huyện</label>
+              <select name="address[district]" class="modal__input" required>
+                <option value="">Chọn Quận/Huyện</option>
+              </select>
+            </div>
+
+            <div class="modal__group">
+              <label class="modal__label">Phường/Xã</label>
+              <select name="address[ward]" class="modal__input" required>
+                <option value="">Chọn Phường/Xã</option>
+              </select>
+            </div>
+
+            <div class="modal__group">
+              <label class="modal__label">Địa chỉ chi tiết</label>
+              <input type="text" name="address[detail]" class="modal__input" placeholder="Nhập địa chỉ chi tiết (số nhà, tên đường...)" />
+            </div>
           </div>
 
           <!-- Submit -->
@@ -238,17 +290,17 @@
 
             <div class="modal__group">
               <label class="modal__label">Email</label>
-              <input type="email" name="email" class="modal__input" required placeholder="Nhập email" />
+              <input type="email" name="email" class="modal__input" required placeholder="Nhập email" autocomplete="email" />
             </div>
 
             <div class="modal__group">
               <label class="modal__label">Mật khẩu mới</label>
-              <input type="password" name="password" class="modal__input" placeholder="Nhập mật khẩu mới (để trống nếu không đổi)" />
+              <input type="password" name="password" class="modal__input" placeholder="Nhập mật khẩu mới (để trống nếu không đổi)" autocomplete="new-password" />
             </div>
 
             <div class="modal__group">
               <label class="modal__label">Nhập lại mật khẩu mới</label>
-              <input type="password" name="confirmPassword" class="modal__input" placeholder="Xác nhận mật khẩu mới (để trống nếu không đổi)" />
+              <input type="password" name="confirmPassword" class="modal__input" placeholder="Xác nhận mật khẩu mới (để trống nếu không đổi)" autocomplete="new-password" />
             </div>
 
             <div class="modal__group">
@@ -264,6 +316,36 @@
             <input type="hidden" name="role" value="admin" />
           </div>
 
+          <div class="modal__separator"></div>
+          <h3 class="modal__heading">Thông tin địa chỉ</h3>
+          <div class="modal__address-info">
+            <div class="modal__group">
+              <label class="modal__label">Tỉnh/Thành phố</label>
+              <select name="address[province]" class="modal__input" required>
+                <option value="">Chọn Tỉnh/Thành phố</option>
+              </select>
+            </div>
+
+            <div class="modal__group">
+              <label class="modal__label">Quận/Huyện</label>
+              <select name="address[district]" class="modal__input" required>
+                <option value="">Chọn Quận/Huyện</option>
+              </select>
+            </div>
+
+            <div class="modal__group">
+              <label class="modal__label">Phường/Xã</label>
+              <select name="address[ward]" class="modal__input" required>
+                <option value="">Chọn Phường/Xã</option>
+              </select>
+            </div>
+
+            <div class="modal__group">
+              <label class="modal__label">Địa chỉ chi tiết</label>
+              <input type="text" name="address[detail]" class="modal__input" placeholder="Nhập địa chỉ chi tiết (số nhà, tên đường...)" />
+            </div>
+          </div>
+
           <!-- Submit -->
           <div class="modal__actions">
             <button type="submit" class="modal__submit">Lưu thay đổi</button>
@@ -275,16 +357,14 @@
     <script>
       // Debug code
       document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM loaded');
-        const deleteButtons = document.querySelectorAll('.account__delete-btn');
-        console.log('Delete buttons found:', deleteButtons.length);
-
+         const deleteButtons = document.querySelectorAll('.account__delete-btn');
+ 
         deleteButtons.forEach(btn => {
-          console.log('Button ID:', btn.dataset.id);
-        });
+         });
       });
     </script>
     <script src="/js/account.js"></script>
+    <script src="/js/address.js"></script>
   </div>
 </body>
 

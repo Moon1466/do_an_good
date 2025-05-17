@@ -1,0 +1,160 @@
+.header {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+  }
+
+  .logo {
+    width: 100px;
+
+    &__icon {
+      height: 40px;
+      width: auto;
+    }
+  }
+
+  &-act {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+
+    &__control {
+      display: flex;
+      gap: 1rem;
+    }
+
+    &__border {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+
+      width: 30px;
+      height: 30px;
+
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      background: #ccc;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+
+    &__img {
+      width: 24px;
+      height: 24px;
+      color: #666;
+    }
+
+    &__auth-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    &__notice,
+    &__cart {
+      position: relative;
+      display: flex;
+      align-self: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    &__link {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    &__img {
+      margin: auto;
+      width: 20px;
+      height: 20px;
+
+      &--color {
+        filter: brightness(0) saturate(100%);
+      }
+    }
+  }
+}
+
+.notice-dropdown,
+.cart-dropdown,
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: none;
+
+  .header-act__border:hover & {
+    display: block;
+  }
+
+  &__wrapper {
+    padding: 1rem;
+  }
+
+  &__heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  &__icon {
+    color: #666;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  &__notice-no-empty {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  &__label {
+    color: #666;
+  }
+}
+
+.user-dropdown {
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+}

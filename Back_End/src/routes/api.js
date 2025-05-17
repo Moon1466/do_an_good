@@ -4,17 +4,21 @@ const routerAPI = express.Router();
 const Category = require('../model/Categories');
 const Product = require('../model/Products');
 const Account = require('../model/Accounts');
+const apiOrderController = require('../controllers/apiOrderController');
+const { storage } = require('../config/cloudinary');
 const multer = require('multer');
-const upload = require('../config/multer');
- 
-const { createCategory, getCategories, getCategoriesbySlugPath , getCategoryById, updatedCategory  , deleteCategory} = require('../controllers/apiCategoryController');
-const { addProduct , getAllProducts, getProductById, updateProductStatus, deleteProduct, updateProduct, deleteSubImage } = require('../controllers/apiProductController');
-const { createAccount, getAllAccounts, getAccountById, updateAccount, deleteAccount } = require('../controllers/apiAccountController');
+const upload = multer({ storage });
+
+const { createCategory, getCategoriesAPI, getCategoriesbySlugPath , getCategoryById, updatedCategory  , deleteCategory} = require('../controllers/apiCategoryController');
+const { addProduct , getAllProducts, getProductById, updateProductStatus, deleteProduct, updateProduct, deleteSubImage, getProductBySlug } = require('../controllers/apiProductController');
+const { createAccount, getAllAccounts, getAccountById, updateAccount, deleteAccount, login } = require('../controllers/apiAccountController');
+const apiCommentController = require('../controllers/apiCommentController');
+const basketController = require('../controllers/apiBasketController');
 
 // ------------ Category ------------------- //
 
 routerAPI.post('/categories', createCategory); // Sử dụng createCategory từ controller
-routerAPI.get('/categories', getCategories); // Lấy tất cả danh mục (có thể filter theo parent)
+routerAPI.get('/categories', getCategoriesAPI); // Lấy tất cả danh mục cho FE (trả về JSON)
 routerAPI.get('/categories/slug/:slugPath', getCategoriesbySlugPath); // Lấy chi tiết theo slugPath
 routerAPI.get('/categories/:id', getCategoryById); // Lấy chi tiết theo id
 routerAPI.put('/categories/:id', updatedCategory); // Cập nhật danh mục
@@ -31,6 +35,9 @@ routerAPI.post('/add', upload.fields([
 // Route lấy tất cả sản phẩm và tìm kiếm
 routerAPI.get('/products', getAllProducts);
 routerAPI.get('/product', getAllProducts); // Thêm route mới cho trang product với tìm kiếm
+
+// Route lấy thông tin sản phẩm theo slug
+routerAPI.get('/products/slug/:slug', getProductBySlug);
 
 // Route lấy thông tin sản phẩm
 routerAPI.get('/products/:id', getProductById);
@@ -54,7 +61,24 @@ routerAPI.delete('/products/:id/subimage/:index', deleteSubImage);
 routerAPI.get('/accounts', getAllAccounts); // Lấy danh sách tài khoản
 routerAPI.get('/accounts/:id', getAccountById); // Lấy chi tiết tài khoản
 routerAPI.post('/account/create', upload.single('avatar'), createAccount); // Tạo tài khoản mới
+routerAPI.post('/account/login', login);
 routerAPI.put('/accounts/:id', upload.single('avatar'), updateAccount); // Cập nhật tài khoản
 routerAPI.delete('/accounts/:id', deleteAccount); // Xóa tài khoản
+
+// ------------ Order ------------------- //
+routerAPI.post('/orders/create', apiOrderController.createOrder);
+routerAPI.get('/orders', apiOrderController.getOrdersByUser);
+routerAPI.get('/orders/:id', apiOrderController.getOrderById);
+routerAPI.put('/orders/:id/status', apiOrderController.updateOrderStatus);
+routerAPI.post('/process-payment', apiOrderController.processPayment);
+
+// ------------ Comment ------------------- //
+routerAPI.get('/comments/:productId', apiCommentController.getProductComments);
+routerAPI.post('/comments/:productId', apiCommentController.addProductComment);
+
+// ------------ Basket ------------------- //
+routerAPI.post('/basket/add', basketController.addToBasket);
+routerAPI.get('/basket/:userId', basketController.getBasket);
+routerAPI.delete('/basket/:userId/:productId', basketController.removeFromBasket);
 
 module.exports = routerAPI;

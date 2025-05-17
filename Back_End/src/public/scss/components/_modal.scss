@@ -51,6 +51,13 @@
     overflow-y: scroll;
   }
 
+  &--order {
+    background-color: transparent;
+    box-shadow: none;
+    
+  
+  }
+
   &__header {
     display: flex;
     align-items: center;
@@ -530,6 +537,17 @@
     }
   }
 
+  &__group-avatar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    & .preview-wrapper img{
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+    }
+  }
   &__account-info {
      display: flex;
      align-items: center;

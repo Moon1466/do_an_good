@@ -21,7 +21,25 @@ const accountSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: true
+        default: ''
+    },
+    address: {
+        province: {
+            type: String,
+            default: ''
+        },
+        district: {
+            type: String,
+            default: ''
+        },
+        ward: {
+            type: String,
+            default: ''
+        },
+        detail: {
+            type: String,
+            default: ''
+        }
     },
     role: {
         type: String,
@@ -30,7 +48,7 @@ const accountSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
-        default: 'default-avatar.png'
+        default: ''
     },
     createdAt: {
         type: Date,

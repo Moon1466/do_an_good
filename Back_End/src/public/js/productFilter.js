@@ -5,13 +5,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const filterButton = document.getElementById('filterButton');
   const filterDropdown = document.getElementById('filterDropdown');
   const filterOptions = document.querySelectorAll('.product__filter-option');
-  const resetFilterButton = document.getElementById('resetFilter');
   
   console.log('Elements found:', {
     filterButton: !!filterButton,
     filterDropdown: !!filterDropdown,
-    filterOptionsCount: filterOptions.length,
-    resetFilterButton: !!resetFilterButton
+    filterOptionsCount: filterOptions.length
   });
   
   // Đối tượng lưu trữ trạng thái lọc hiện tại
@@ -39,15 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Reset tất cả bộ lọc
-  resetFilterButton.addEventListener('click', function() {
-    console.log('Reset button clicked');
-    filterState.sort = null;
-    filterState.status = null;
-    filterState.sale = null;
-    applyFilters();
-  });
-
   // Xử lý sự kiện click vào option
   filterOptions.forEach(option => {
     option.addEventListener('click', function() {
@@ -55,6 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
       const sortType = this.getAttribute('data-sort');
       const filterType = this.getAttribute('data-filter');
       const filterValue = this.getAttribute('data-value');
+      
+      // Ẩn dropdown sau khi click
+      filterDropdown.style.display = 'none';
       
       console.log('Filter clicked:', { sortType, filterType, filterValue });
       
@@ -121,9 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
           case 'oldest':
             return 1;
           case 'asc':
-            return nameA.localeCompare(nameB, 'vi');
-          case 'desc':
             return nameB.localeCompare(nameA, 'vi');
+          case 'desc':
+            return nameA.localeCompare(nameB, 'vi');
           default:
             return 0;
         }
@@ -151,8 +143,8 @@ document.addEventListener('DOMContentLoaded', function() {
       emptyMessage.style.borderRadius = '8px';
       emptyMessage.style.margin = '20px 0';
       emptyMessage.innerHTML = `
-        <img src="images/icons/empty-box.svg" alt="No products" style="width: 64px; height: 64px; margin-bottom: 16px;">
-        <p style="margin: 0;">Không tìm thấy sản phẩm phù hợp với bộ lọc</p>
+        <img src="images/icons/product_not_found.png" alt="No products" style="width: 64px; height: 64px; margin-bottom: 16px;">
+        <p style="margin: 0; font-size: 1.2rem; font-weight: 400; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.1rem;">Không tìm thấy sản phẩm phù hợp với bộ lọc</p>
       `;
       headerMain.after(emptyMessage);
     } else {

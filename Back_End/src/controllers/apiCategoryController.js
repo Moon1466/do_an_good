@@ -6,7 +6,20 @@ const Category = require('../model/Categories'); // Đảm bảo đường dẫn
 const createCategory = async (req, res) => {
   try {
     const { name, parent } = req.body;
-    const newCategory = new Category({ name, parent: parent || null });
+
+    // Kiểm tra xem parent có tồn tại không nếu được cung cấp
+    if (parent) {
+      const parentCategory = await Category.findById(parent);
+      if (!parentCategory) {
+        return res.status(400).json({ message: 'Danh mục cha không tồn tại' });
+      }
+    }
+
+    const newCategory = new Category({ 
+      name, 
+      parent: parent || null 
+    });
+    
     await newCategory.save();
 
     // Nếu có parent, cập nhật subCategories cho cha
@@ -19,16 +32,30 @@ const createCategory = async (req, res) => {
 
     res.status(201).json({ message: 'Thêm danh mục thành công', category: newCategory });
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Tên danh mục đã tồn tại' });
+    }
     res.status(500).json({ message: 'Lỗi khi thêm danh mục', error: err.message });
   }
 };
 
 const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find().lean(); // Lấy danh sách danh mục
-    const subCategories = await Category.find({ parent: { $exists: true } }).lean(); // Lấy danh mục con
+    // Chỉ lấy các danh mục gốc (không có parent)
+    const categories = await Category.find({ parent: null }).lean();
 
-    res.render("category", { categories, subCategories }); // Truyền cả categories và subCategories vào view
+    // Tính số lượng danh mục con cho mỗi danh mục gốc
+    const categoriesWithCounts = await Promise.all(
+      categories.map(async (cat) => {
+        const subCategoriesCount = await Category.countDocuments({ parent: cat._id });
+        return {
+          ...cat,
+          subCategoriesCount
+        };
+      })
+    );
+
+    res.render("category", { categories: categoriesWithCounts });
   } catch (err) {
     console.error("Error fetching categories:", err);
     res.status(500).send("Internal Server Error");
@@ -228,6 +255,16 @@ const getRootCategories = async (req, res) => {
     }
   };
   
+// API trả về JSON cho FE
+const getCategoriesAPI = async (req, res) => {
+  try {
+    const categories = await Category.find().lean();
+    res.json({ success: true, data: categories });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
-  createCategory , getCategories , getCategoriesbySlugPath , getCategoryById , updatedCategory , deleteCategory, newCategory, showCategory, getRootCategories
+  createCategory , getCategories , getCategoriesbySlugPath , getCategoryById , updatedCategory , deleteCategory, newCategory, showCategory, getRootCategories, getCategoriesAPI
 };

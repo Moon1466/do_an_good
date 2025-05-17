@@ -6,6 +6,13 @@ import ProductDetail from "./pages/ProductDetail/ProductDetail.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
 import Payment from "./pages/Payment/Payment.jsx";
 import Search from "./pages/Search/Search.jsx";
+import Home from "./pages/Home/Home.jsx";
+import VnpayCheckout from "./pages/Payment/VnpayCheckout.jsx";
+import PaymentSuccess from "./pages/Payment/PaymentSuccess.jsx";
+import Profile from "./pages/Profile/Profile.jsx";
+// Import global styles
+import "./styles/index.scss";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -13,10 +20,10 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <>Hello my friend</>,  
+        element: <Home />,
       },
       {
-        path: "/product-detail",
+        path: "/product-detail/:id",
         element: <ProductDetail />,
       },
       {
@@ -28,8 +35,20 @@ const router = createBrowserRouter([
         element: <Payment />,
       },
       {
+        path: "/payment/vnpay-checkout",
+        element: <VnpayCheckout />,
+      },
+      {
+        path: "/payment/success",
+        element: <PaymentSuccess />,
+      },
+      {
         path: "/search",
         element: <Search />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
       },
     ],
   },

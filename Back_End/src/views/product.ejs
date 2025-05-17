@@ -87,62 +87,57 @@
                       <span class="product__text">Lọc</span>
                     </button>
                     <div class="product__filter-dropdown" id="filterDropdown">
-                      <div class="product__filter-header">
-                        <span>Bộ lọc</span>
-                        <button class="product__filter-reset" id="resetFilter">
-                          <span>Đặt lại</span>
-                        </button>
-                      </div>
+
                       <div class="product__filter-content">
-                        <div class="product__filter-column">
-                          <div class="product__filter-group">
-                            <div class="product__filter-title">Sắp xếp theo thời gian</div>
-                            <div class="product__filter-options">
-                              <div class="product__filter-option" data-sort="newest">
-                                <span>Mới nhất</span>
-                              </div>
-                              <div class="product__filter-option" data-sort="oldest">
-                                <span>Cũ nhất</span>
-                              </div>
+
+                        <div class="product__filter-group">
+                          <div class="product__filter-title">Thời gian</div>
+                          <div class="product__filter-options">
+                            <div class="product__filter-option" data-sort="newest">
+                              <span>Mới nhất</span>
+                            </div>
+                            <div class="product__filter-option" data-sort="oldest">
+                              <span>Cũ nhất</span>
                             </div>
                           </div>
-                          <div class="product__filter-group">
-                            <div class="product__filter-title">Sắp xếp theo tên</div>
-                            <div class="product__filter-options">
-                              <div class="product__filter-option" data-sort="asc">
-                                <span>Tên A -> Z</span>
-                              </div>
-                              <div class="product__filter-option" data-sort="desc">
-                                <span>Tên Z -> A</span>
-                              </div>
+                        </div>
+                        <div class="product__filter-group">
+                          <div class="product__filter-title">Tên</div>
+                          <div class="product__filter-options">
+                            <div class="product__filter-option" data-sort="asc">
+                              <span>A -> Z</span>
+                            </div>
+                            <div class="product__filter-option" data-sort="desc">
+                              <span>Z -> A</span>
                             </div>
                           </div>
                         </div>
 
-                        <div class="product__filter-column">
-                          <div class="product__filter-group">
-                            <div class="product__filter-title">Trạng thái</div>
-                            <div class="product__filter-options">
-                              <div class="product__filter-option" data-filter="status" data-value="active">
-                                <span>Đang hoạt động</span>
-                              </div>
-                              <div class="product__filter-option" data-filter="status" data-value="inactive">
-                                <span>Ngừng hoạt động</span>
-                              </div>
+
+
+                        <div class="product__filter-group">
+                          <div class="product__filter-title">Trạng thái</div>
+                          <div class="product__filter-options">
+                            <div class="product__filter-option" data-filter="status" data-value="active">
+                              <span>Đang hoạt động</span>
                             </div>
-                          </div>
-                          <div class="product__filter-group">
-                            <div class="product__filter-title">Giảm giá</div>
-                            <div class="product__filter-options">
-                              <div class="product__filter-option" data-filter="sale" data-value="true">
-                                <span>Đang giảm giá</span>
-                              </div>
-                              <div class="product__filter-option" data-filter="sale" data-value="false">
-                                <span>Không giảm giá</span>
-                              </div>
+                            <div class="product__filter-option" data-filter="status" data-value="inactive">
+                              <span>Ngừng hoạt động</span>
                             </div>
                           </div>
                         </div>
+                        <div class="product__filter-group">
+                          <div class="product__filter-title">Giảm giá</div>
+                          <div class="product__filter-options">
+                            <div class="product__filter-option" data-filter="sale" data-value="true">
+                              <span>Đang giảm giá</span>
+                            </div>
+                            <div class="product__filter-option" data-filter="sale" data-value="false">
+                              <span>Không giảm giá</span>
+                            </div>
+                          </div>
+                        </div>
+
                       </div>
                     </div>
                   </div>
@@ -166,14 +161,14 @@
                 <!-- Body -->
                 <% if (products.length === 0) { %>
                 <div class="product__empty" style="text-align: center; padding: 40px; color: #666; font-size: 16px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
-                  <img src="images/icons/empty-box.svg" alt="No products" style="width: 64px; height: 64px; margin-bottom: 16px;">
-                  <p style="margin: 0;">Không tìm thấy sản phẩm nào phù hợp với từ khóa "<%= searchTerm %>"</p>
+                  <img src="images/icons/product_not_found.png" alt="No products" style="width: 64px; height: 64px; margin-bottom: 16px;">
+                  <p style="margin: 0; font-size: 1.2rem; font-weight: 400; font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.1rem;">Không tìm thấy sản phẩm nào phù hợp với từ khóa "<%= searchTerm %>"</p>
                 </div>
                 <% } else { %>
                 <% products.forEach(product => { %>
                 <div class="product__body-main">
                   <div class="product__image">
-                    <img src="<%= product.images && product.images[0] ? '/images/uploads/' + product.images[0] : '/images/products/default.jpg' %>" alt="" class="product__img" />
+                    <img src="<%= product.images && product.images[0] ? product.images[0] : '/images/products/default.jpg' %>" alt="" class="product__img" />
                   </div>
                   <div class="product__name"><%= product.name %></div>
                   <div class="product__price"><%= product.price.toLocaleString() %> đ</div>

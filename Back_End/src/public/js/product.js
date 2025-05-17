@@ -84,7 +84,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const img = document.createElement('img');
         
         reader.onload = function(e) {
-          img.src = e.target.result;
+          let imgSrc = e.target.result.toString();
+          if (imgSrc.startsWith('/images/uploads/')) {
+            imgSrc = imgSrc.replace('/images/uploads/', '');
+          }
+          if (!imgSrc.startsWith('http')) {
+            imgSrc = 'https://res.cloudinary.com/dcqyuixqu/image/upload/' + imgSrc;
+          }
+          img.src = imgSrc;
         }
         
         reader.readAsDataURL(file);
@@ -342,9 +349,14 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           
           // Hiển thị hình ảnh chính hiện tại
-          if (product.images && product.images[0]) {
-            document.getElementById('currentImage').src = `/images/uploads/${product.images[0]}`;
+          let imgSrc = product.images[0];
+          if (imgSrc.startsWith('/images/uploads/')) {
+            imgSrc = imgSrc.replace('/images/uploads/', '');
           }
+          if (!imgSrc.startsWith('http')) {
+            imgSrc = 'https://res.cloudinary.com/dcqyuixqu/image/upload/' + imgSrc;
+          }
+          document.getElementById('currentImage').src = imgSrc;
 
           // Hiển thị các hình ảnh phụ với nút xóa
           const currentSubImagesContainer = document.getElementById('currentSubImages');
@@ -354,9 +366,15 @@ document.addEventListener('DOMContentLoaded', function() {
             product.subImages.forEach((imageName, index) => {
               const imgWrapper = document.createElement('div');
               imgWrapper.className = 'preview-image-wrapper';
-              
+              let imgSrc = imageName;
+              if (imgSrc.startsWith('/images/uploads/')) {
+                imgSrc = imgSrc.replace('/images/uploads/', '');
+              }
+              if (!imgSrc.startsWith('http')) {
+                imgSrc = 'https://res.cloudinary.com/dcqyuixqu/image/upload/' + imgSrc;
+              }
               const img = document.createElement('img');
-              img.src = `/images/uploads/${imageName}`;
+              img.src = imgSrc;
               
               // Tạo nút xóa
               const deleteButton = document.createElement('button');
@@ -664,7 +682,14 @@ if (editSubImagesInput) {
         };
         
         reader.onload = function(e) {
-          img.src = e.target.result;
+          let imgSrc = e.target.result.toString();
+          if (imgSrc.startsWith('/images/uploads/')) {
+            imgSrc = imgSrc.replace('/images/uploads/', '');
+          }
+          if (!imgSrc.startsWith('http')) {
+            imgSrc = 'https://res.cloudinary.com/dcqyuixqu/image/upload/' + imgSrc;
+          }
+          img.src = imgSrc;
         }
         
         reader.readAsDataURL(file);
@@ -676,3 +701,4 @@ if (editSubImagesInput) {
   });
 }
 
+ 

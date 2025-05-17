@@ -13,8 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Kiểm tra xem các elements có tồn tại không
     if (!addAccountBtn || !addModal || !editModal || !closeAddModal || !closeEditModal || !addForm || !editForm) {
-        console.error('Không tìm thấy một hoặc nhiều elements cần thiết');
-        return;
+        throw new Error('Không tìm thấy một hoặc nhiều elements cần thiết');
     }
 
     // Mở modal thêm mới
@@ -105,6 +104,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const formData = new FormData(addForm);
+            
+            // Debug form data
+            console.log('Form Data:', {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                fullName: formData.get('fullName'),
+                phone: formData.get('phone'),
+                role: formData.get('role'),
+                address: {
+                    province: formData.get('address[province]'),
+                    district: formData.get('address[district]'),
+                    ward: formData.get('address[ward]'),
+                    detail: formData.get('address[detail]')
+                },
+                avatar: formData.get('avatar')
+            });
+
             const password = formData.get('password');
             const confirmPassword = formData.get('confirmPassword');
 
@@ -123,12 +139,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            // Validate address fields
+            const province = formData.get('address[province]');
+            const district = formData.get('address[district]');
+            const ward = formData.get('address[ward]');
+            const city = formData.get('address[city]');
+            const detail = formData.get('address[detail]');
+
+            if (!province || !district || !ward) {
+                alert('Vui lòng chọn Tỉnh/Thành phố, Quận/Huyện và Phường/Xã!');
+                return;
+            }
+
+            console.log('Sending request to create account...');
             const response = await fetch('/api/account/create', {
                 method: 'POST',
                 body: formData
             });
 
+            console.log('Response status:', response.status);
             const data = await response.json();
+            console.log('Response data:', data);
 
             if (data.success) {
                 alert('Tạo tài khoản thành công!');
@@ -141,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert(data.message || 'Có lỗi xảy ra');
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error creating account:', error);
             alert('Có lỗi xảy ra');
         }
     });
@@ -172,6 +203,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.delete('confirmPassword');
             }
 
+            // Validate address fields
+            const province = formData.get('address[province]');
+            const district = formData.get('address[district]');
+            const ward = formData.get('address[ward]');
+            const detail = formData.get('address[detail]');
+
+            if (!province || !district || !ward) {
+                alert('Vui lòng chọn Tỉnh/Thành phố, Quận/Huyện và Phường/Xã!');
+                return;
+            }
+
             const response = await fetch(`/api/accounts/${accountId}`, {
                 method: 'PUT',
                 body: formData
@@ -190,7 +232,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert(data.message || 'Có lỗi xảy ra');
             }
         } catch (error) {
-            console.error('Error:', error);
             alert('Có lỗi xảy ra');
         }
     });
@@ -215,7 +256,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         alert(data.message || 'Có lỗi xảy ra khi xóa tài khoản');
                     }
                 } catch (error) {
-                    console.error('Error:', error);
                     alert('Có lỗi xảy ra khi xóa tài khoản');
                 }
             }
@@ -223,42 +263,99 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Hàm mở modal sửa và điền thông tin
-    async function openEditModal(accountId) {
+    const openEditModal = async (accountId) => {
         try {
+            console.log('Opening edit modal for account:', accountId);
+            editModal.style.display = 'block';
+
+            // Fetch account data
             const response = await fetch(`/api/accounts/${accountId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
             const data = await response.json();
-
-            if (!data.success || !data.account) {
-                throw new Error('Không thể lấy thông tin tài khoản');
+            
+            if (!data.success) {
+                console.error('Failed to fetch account data:', data.message);
+                editModal.style.display = 'none';
+                return;
             }
 
+            console.log('Full API Response:', data);
             const account = data.account;
-            document.getElementById('editAccountId').value = accountId;
-            
-            // Điền thông tin vào form
+
+            // Set basic account information using form selectors
             editForm.querySelector('[name="username"]').value = account.username || '';
             editForm.querySelector('[name="email"]').value = account.email || '';
             editForm.querySelector('[name="fullName"]').value = account.fullName || '';
             editForm.querySelector('[name="phone"]').value = account.phone || '';
-            
-            // Reset trường password
+            editForm.querySelector('[name="role"]').value = account.role || '';
+
+            // Reset password fields
             editForm.querySelector('[name="password"]').value = '';
             editForm.querySelector('[name="confirmPassword"]').value = '';
+
+            // Handle avatar display
+            const avatarPreview = document.getElementById('previewEditAvatar');
+            if (account.avatar) {
+                avatarPreview.src = `/images/uploads/${account.avatar}`;
+                avatarPreview.style.display = 'block';
+            } else {
+                avatarPreview.src = defaultAvatarSrc;
+                avatarPreview.style.display = 'block';
+            }
+
+            // Debug address data
+            console.log('Address data from API:', account.address);
+            console.log('Edit form elements:', {
+                provinceSelect: editForm.querySelector('select[name="address[province]"]'),
+                districtSelect: editForm.querySelector('select[name="address[district]"]'),
+                wardSelect: editForm.querySelector('select[name="address[ward]"]'),
+                detailInput: editForm.querySelector('input[name="address[detail]"]')
+            });
             
-            // Hiển thị avatar
-            previewEditAvatar.src = account.avatar ? `/images/uploads/${account.avatar}` : defaultAvatarSrc;
-            
-            // Hiển thị modal
-            editModal.style.display = 'flex';
-            editModal.classList.add('show');
+            if (account.address && 
+                account.address.province && 
+                account.address.district && 
+                account.address.ward) {
+                
+                console.log('Setting address values:', {
+                    province: account.address.province,
+                    district: account.address.district,
+                    ward: account.address.ward,
+                    detail: account.address.detail
+                });
+
+                // Wait a bit to ensure modal is fully rendered
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                try {
+                    await setAddressValues(
+                        account.address.province,
+                        account.address.district,
+                        account.address.ward,
+                        account.address.detail
+                    );
+                } catch (error) {
+                    console.error('Error setting address values:', error);
+                }
+            } else {
+                console.warn('Incomplete or missing address data:', account.address);
+                // Reset address fields
+                const editProvinceSelect = editForm.querySelector('select[name="address[province]"]');
+                const editDistrictSelect = editForm.querySelector('select[name="address[district]"]');
+                const editWardSelect = editForm.querySelector('select[name="address[ward]"]');
+                const editDetailInput = editForm.querySelector('input[name="address[detail]"]');
+
+                if (editProvinceSelect) editProvinceSelect.value = '';
+                if (editDistrictSelect) editDistrictSelect.value = '';
+                if (editWardSelect) editWardSelect.value = '';
+                if (editDetailInput) editDetailInput.value = '';
+            }
+
+            // Store account ID for form submission
+            editForm.querySelector('[name="accountId"]').value = accountId;
+
         } catch (error) {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra khi lấy thông tin tài khoản: ' + error.message);
+            console.error('Error in openEditModal:', error);
+            editModal.style.display = 'none';
         }
-    }
+    };
 }); 

@@ -4,6 +4,12 @@ const mongoose = require('mongoose');
 const Product = require('../model/Products');
 const Category = require('../model/Categories'); 
 
+const CLOUDINARY_PREFIX = 'https://res.cloudinary.com/dcqyuixqu/image/upload/';
+
+function getCloudinaryUrl(img) {
+  if (!img) return '';
+  return img.startsWith('http') ? img : CLOUDINARY_PREFIX + img;
+}
 
 const createProduct = async (req, res) => {
   try {
@@ -72,10 +78,10 @@ const addProduct = async (req, res) => {
     let images = [];
     let subImages = [];
     if (req.files && req.files['images']) {
-      images = req.files['images'].map(file => file.filename);
+      images = req.files['images'].map(file => file.path);
     }
     if (req.files && req.files['subImages']) {
-      subImages = req.files['subImages'].map(file => file.filename);
+      subImages = req.files['subImages'].map(file => file.path);
     }
 
     // Tạo sản phẩm mới
@@ -107,67 +113,66 @@ const addProduct = async (req, res) => {
 const getAllProducts = async (req, res) => {
   try {
     let query = {};
-    
-    // Nếu có tham số tìm kiếm
+
+    // Tìm kiếm theo tên
     if (req.query.search) {
-      query = {
-        name: { 
-          $regex: new RegExp(req.query.search, 'i') // Tìm kiếm không phân biệt hoa thường và dấu
-        }
-      };
+      query.name = { $regex: new RegExp(req.query.search, 'i') };
     }
-    
+
+    // Lọc theo danh mục (bao gồm cả danh mục con)
+    if (req.query.categories) {
+      const categoryIds = req.query.categories.split(',');
+      let allCategoryIds = [...categoryIds];
+      // Lấy thêm các danh mục con cho mỗi danh mục cha
+      for (const catId of categoryIds) {
+        const subCats = await Category.find({ parent: catId }).select('_id');
+        subCats.forEach(sub => allCategoryIds.push(String(sub._id)));
+      }
+      query.category = { $in: allCategoryIds };
+    }
+
+    // Lọc theo giá
+    if (req.query.minPrice) {
+      query.price = { ...query.price, $gte: Number(req.query.minPrice) };
+    }
+    if (req.query.maxPrice && req.query.maxPrice !== 'Infinity') {
+      query.price = { ...query.price, $lte: Number(req.query.maxPrice) };
+    }
+
     const products = await Product.find(query).populate({
       path: 'category',
-      populate: {
-        path: 'parent'
-      }
+      populate: { path: 'parent' }
     });
-    
+
     // Lấy tất cả categories và phân loại
     const allCategories = await Category.find();
     const parentCategories = allCategories.filter(cat => !cat.parent);
     const childCategories = allCategories.filter(cat => cat.parent);
-    
-    if (req.path === '/product') {
-      // Nếu là route /product, render view
-      res.render('product', { 
-        products, 
-        categories: allCategories,
-        parentCategories,
-        childCategories,
-        searchTerm: req.query.search || ''
-      });
-    } else {
-      // Nếu là API route /products, trả về JSON
-      res.json({
-        success: true,
-        data: products
-      });
-    }
+
+    // Chuyển đổi URL cho từng sản phẩm
+    const productsWithImageUrl = products.map(product => ({
+      ...product.toObject(),
+      images: product.images.map(getCloudinaryUrl),
+      subImages: product.subImages.map(getCloudinaryUrl),
+    }));
+
+    // Nếu là API route /products, trả về JSON
+    res.json({
+      success: true,
+      data: productsWithImageUrl
+    });
   } catch (error) {
-    if (req.path === '/product') {
-      res.render('product', { 
-        products: [],
-        categories: [],
-        parentCategories: [],
-        childCategories: [],
-        searchTerm: req.query.search || '',
-        error: 'Có lỗi xảy ra khi tìm kiếm sản phẩm'
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        message: 'Lỗi khi lấy danh sách sản phẩm'
-      });
-    }
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách sản phẩm'
+    });
   }
 };
 
 const getProductById = async (req, res) => {
     try {
         const productId = req.params.id;
-        // Populate cả category và lấy thêm thông tin parent của category
+        // Populate category và parent (1 cấp)
         const product = await Product.findById(productId)
             .populate({
                 path: 'category',
@@ -183,13 +188,29 @@ const getProductById = async (req, res) => {
             });
         }
 
-        // Lấy thêm tất cả categories để client có thể xử lý
-        const allCategories = await Category.find();
+        // Lấy breadcrumbs category (nhiều cấp)
+        let breadcrumbs = [];
+        let current = product.category;
+        while (current) {
+            breadcrumbs.unshift({
+                name: current.name,
+                slug: current.slug,
+                _id: current._id
+            });
+            current = current.parent;
+        }
+
+        // Chuyển đổi URL cho sản phẩm
+        const productWithImageUrl = {
+          ...product.toObject(),
+          images: product.images.map(getCloudinaryUrl),
+          subImages: product.subImages.map(getCloudinaryUrl),
+        };
 
         res.json({
             success: true,
-            data: product,
-            categories: allCategories
+            data: productWithImageUrl,
+            categoryBreadcrumbs: breadcrumbs // Thêm mảng breadcrumbs
         });
     } catch (error) {
         res.status(500).json({
@@ -289,7 +310,7 @@ const updateProduct = async (req, res) => {
     if (req.files) {
       // Nếu có ảnh chính mới, cập nhật ảnh chính
       if (req.files['images'] && req.files['images'].length > 0) {
-        updateData.images = req.files['images'].map(file => file.filename);
+        updateData.images = req.files['images'].map(file => file.path);
       }
       
       // Nếu có ảnh phụ mới, thêm vào mảng ảnh phụ hiện có
@@ -299,7 +320,7 @@ const updateProduct = async (req, res) => {
         const currentSubImages = currentProduct.subImages || [];
         
         // Thêm ảnh mới vào mảng hiện có
-        const newSubImages = req.files['subImages'].map(file => file.filename);
+        const newSubImages = req.files['subImages'].map(file => file.path);
         updateData.subImages = [...currentSubImages, ...newSubImages];
       }
     }
@@ -397,6 +418,46 @@ const deleteSubImage = async (req, res) => {
   }
 };
 
+const getProductBySlug = async (req, res) => {
+    try {
+        const { slug } = req.params;
+        
+        // Tìm sản phẩm theo slug và populate thông tin category
+        const product = await Product.findOne({ slug })
+            .populate({
+                path: 'category',
+                populate: {
+                    path: 'parent'
+                }
+            });
+        
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy sản phẩm'
+            });
+        }
+
+        // Chuyển đổi URL cho sản phẩm
+        const productWithImageUrl = {
+            ...product.toObject(),
+            images: product.images.map(getCloudinaryUrl),
+            subImages: product.subImages.map(getCloudinaryUrl),
+        };
+
+        res.json({
+            success: true,
+            data: productWithImageUrl
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server khi lấy thông tin sản phẩm',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
-  createProduct, addProduct, getAllProducts, getProductById, updateProductStatus, deleteProduct, updateProduct, deleteSubImage,
+  createProduct, addProduct, getAllProducts, getProductById, updateProductStatus, deleteProduct, updateProduct, deleteSubImage, getProductBySlug
 };
