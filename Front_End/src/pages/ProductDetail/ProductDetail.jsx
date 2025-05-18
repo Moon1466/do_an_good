@@ -16,6 +16,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [canReview, setCanReview] = useState(false);
   const [loadingCheck, setLoadingCheck] = useState(true);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     console.log("ProductDetail useEffect - id:", id, "slug:", slug);
@@ -69,9 +70,16 @@ const ProductDetail = () => {
         // 2. Lọc đơn hàng có email trùng với user
         const orders = allOrders.filter((order) => order.customer && order.customer.email === user.email);
         console.log("orders filtered by email", orders);
+        orders.forEach((order) => {
+          console.log("Order status:", order.status);
+          order.products.forEach((p) => {
+            console.log("ProductId in order:", p.productId, "Compare with:", id);
+          });
+        });
         // 3. Kiểm tra có đơn hàng đã xác nhận và chứa sản phẩm này không
         const hasPurchased = orders.some(
-          (order) => order.status === "Đã xác nhận" && order.products.some((p) => p.productId === id)
+          (order) =>
+            order.status === "Đã xác nhận" && order.products.some((p) => p.productId?.toString() === id?.toString())
         );
         console.log("hasPurchased", hasPurchased, orders);
         if (!hasPurchased) {
@@ -154,7 +162,6 @@ const ProductDetail = () => {
     const [showModal, setShowModal] = useState(false);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
-    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -271,8 +278,12 @@ const ProductDetail = () => {
                     return (
                       <div className="comment-rating__bar" key={star}>
                         <span className="comment-rating__label">{star} sao</span>
-                        <div className="comment-rating__progress" style={{ width: `${percentage}%` }}></div>
-                        <span className="comment-rating__percentage">{percentage.toFixed(0)}%</span>
+                        <div className="comment-rating__progress-bar">
+                          <div
+                            className="comment-rating__progress"
+                            style={{ width: `${percentage}%`, background: "#FFD600" }}></div>
+                        </div>
+                        <span className="comment-rating__percentage">{`${Math.round(percentage)}%`}</span>
                       </div>
                     );
                   })}
@@ -286,9 +297,7 @@ const ProductDetail = () => {
                     Viết bình luận
                   </button>
                 ) : (
-                  <span className="comment-reviews__label">
-                   Bạn cần mua sản phẩm để được đánh giá
-                  </span>
+                  <span className="comment-reviews__label">Bạn cần mua sản phẩm để được đánh giá</span>
                 )}
               </div>
             </div>
@@ -314,27 +323,29 @@ const ProductDetail = () => {
                       </div>
                       <div className="comment-content__right">
                         <div className="comment-content__rating">
-                          {[...Array(review.rating)].map((_, i) => (
+                          {[1, 2, 3, 4, 5].map((star, i) => (
                             <img
                               key={i}
                               src="/src/assets/images/icon/star.svg"
                               alt=""
                               className="comment-content__star"
+                              style={{
+                                filter:
+                                  star <= review.rating
+                                    ? "grayscale(0%) brightness(1) sepia(1) hue-rotate(-20deg) saturate(5) brightness(1.2)"
+                                    : "grayscale(100%) brightness(1.5)",
+                              }}
                             />
                           ))}
                         </div>
                         <div className="comment-content__body">{review.comment}</div>
                         <div className="comment-content__footer">
                           <button className="comment-content__like">
-                            <img src="/assets/images/icon/like.svg" alt="" />
+                            <img src="/src/assets/images/icon/like.svg" alt="" />
                             Thích ({review.likes || 0})
                           </button>
-                          <button className="comment-content__report">
-                            <img src="/assets/images/icon/report.svg" alt="" />
-                            Báo cáo
-                          </button>
                         </div>
-                    </div>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -420,6 +431,8 @@ const ProductDetail = () => {
     );
   };
 
+  const avg = reviews.length > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length : 0;
+
   return (
     <div>
       {/* Breadcrumb luôn hiển thị, nếu có dữ liệu category */}
@@ -468,7 +481,7 @@ const ProductDetail = () => {
                   </div>
                   {/* Policy */}
                   <div className="pd-dt-policy">
-                    <h4 className="pd-dt-policy__title">Chính sách ưu đãi của Fahasa</h4>
+                    <h4 className="pd-dt-policy__title">Chính sách ưu đãi</h4>
                     {[
                       {
                         icon: "/src/assets/images/icon/ico_truck_v2.webp",
@@ -537,12 +550,18 @@ const ProductDetail = () => {
                   <div className="pd-dt-info__rating">
                     {/* Star */}
                     <div className="pd-dt-info__rating-stars">
-                      {[1, 2, 3, 4, 5].map((i) => (
+                      {[1, 2, 3, 4, 5].map((star) => (
                         <img
-                          key={i}
+                          key={star}
                           src="/src/assets/images/icon/star.svg"
                           alt=""
                           className="pd-dt-info__rating-star"
+                          style={{
+                            filter:
+                              star <= Math.floor(avg)
+                                ? "grayscale(0%) brightness(1) sepia(1) hue-rotate(-20deg) saturate(5) brightness(1.2)"
+                                : "grayscale(100%) brightness(1.5)",
+                          }}
                         />
                       ))}
                     </div>

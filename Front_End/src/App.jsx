@@ -8,7 +8,7 @@ import { Outlet, useLocation } from "react-router-dom";
 
 const App = () => {
   const location = useLocation();
-  const hideFooter = location.pathname.startsWith("/payment");
+  const hideFooter = location.pathname.startsWith("/payment") || location.pathname === "/forgot-password";
   return (
     <>
       <Header />

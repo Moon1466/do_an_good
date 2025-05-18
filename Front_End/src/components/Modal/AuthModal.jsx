@@ -197,7 +197,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
                   />
                   Ghi nhớ mật khẩu
                 </label>
-                <a href="#" className="auth-modal__forgot-link">
+                <a href="/forgot-password" className="auth-modal__forgot-link">
                   Quên mật khẩu?
                 </a>
               </div>

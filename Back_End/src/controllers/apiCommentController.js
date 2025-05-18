@@ -21,7 +21,8 @@ const getProductComments = async (req, res) => {
           allReviews.push({
             userName: c.userInfo?.name || 'Ẩn danh',
             rating: r.rating,
-            comment: r.comment
+            comment: r.comment,
+            createdAt: r.createdAt
           });
         });
       }

@@ -11,6 +11,7 @@ import VnpayCheckout from "./pages/Payment/VnpayCheckout.jsx";
 import PaymentSuccess from "./pages/Payment/PaymentSuccess.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import OrderHistory from "./pages/OrderHistory/OrderHistory.jsx";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 // Import global styles
 import "./styles/index.scss";
 
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: "/order-history",
         element: <OrderHistory />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
       },
     ],
   },
