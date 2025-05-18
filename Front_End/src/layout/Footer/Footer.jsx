@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Footer.scss";
 
 const Footer = () => {
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/setting")
+      .then((res) => res.json())
+      .then((data) => setSettings(data));
+  }, []);
+
   return (
     <footer className="footer">
       <div className="footer__container">
@@ -12,13 +20,19 @@ const Footer = () => {
               <span role="img" aria-label="location">
                 📍
               </span>{" "}
-              TP. Hồ Chí Minh
+              {settings?.address || "TP. Hồ Chí Minh"}
+            </div>
+            <div className="footer__info-item">
+              <span role="img" aria-label="phone">
+                📞
+              </span>{" "}
+              {settings?.phone || "0123 456 789"}
             </div>
             <div className="footer__info-item">
               <span role="img" aria-label="email">
                 ✉️
               </span>{" "}
-              28tech.work@gmail.com
+              {settings?.gmail || "28tech.work@gmail.com"}
             </div>
           </div>
         </div>

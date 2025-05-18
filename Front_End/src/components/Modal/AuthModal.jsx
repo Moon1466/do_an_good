@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -18,6 +18,14 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     phone: "",
   });
   const [error, setError] = useState("");
+  const [settings, setSettings] = useState(null);
+  const [remember, setRemember] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/setting")
+      .then((res) => res.json())
+      .then((data) => setSettings(data));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -135,6 +143,14 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
           <FaTimes />
         </button>
 
+        <div className="auth-modal__logo" style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+          <img
+            src={settings?.logo || "/assets/images/icon/fahasa-logo.webp"}
+            alt="Logo"
+            style={{ height: 48, objectFit: "contain" }}
+          />
+        </div>
+
         <div className="auth-modal__tabs">
           <button className={`auth-modal__tab ${isLogin ? "active" : ""}`} onClick={() => setIsLogin(true)}>
             Đăng nhập
@@ -170,6 +186,20 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
                   onChange={handleChange}
                   required
                 />
+              </div>
+              <div className="auth-modal__remember-row">
+                <label className="auth-modal__remember-label">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={() => setRemember((v) => !v)}
+                    style={{ marginRight: 4 }}
+                  />
+                  Ghi nhớ mật khẩu
+                </label>
+                <a href="#" className="auth-modal__forgot-link">
+                  Quên mật khẩu?
+                </a>
               </div>
               <button type="submit" className="auth-modal__submit">
                 Đăng nhập

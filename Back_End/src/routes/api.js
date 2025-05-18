@@ -84,5 +84,6 @@ routerAPI.delete('/basket/:userId/:productId', basketController.removeFromBasket
 
 // ------------ Setting ------------------- //
 routerAPI.post('/setting/update', upload.single('logo'), apiSettingController.updateSetting);
+routerAPI.get('/setting', apiSettingController.getSetting);
 
 module.exports = routerAPI;

@@ -42,4 +42,13 @@ const updateSetting = async (req, res) => {
   }
 };
 
-module.exports = { updateSetting };
+const getSetting = async (req, res) => {
+  try {
+    const settings = await Settings.findOne();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ error: 'Lỗi lấy thông tin cài đặt' });
+  }
+};
+
+module.exports = { updateSetting, getSetting };

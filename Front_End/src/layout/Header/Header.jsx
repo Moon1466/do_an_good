@@ -15,6 +15,7 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+  const [settings, setSettings] = useState(null);
 
   useEffect(() => {
     // Kiểm tra cookie khi component mount
@@ -24,6 +25,12 @@ const Header = () => {
       setUserInfo(user);
       setIsLoggedIn(true);
     }
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/setting")
+      .then((res) => res.json())
+      .then((data) => setSettings(data));
   }, []);
 
   const handleAuthClick = () => {
@@ -71,15 +78,11 @@ const Header = () => {
   return (
     <header id="header" className="header">
       {/* Link test chuyển hướng profile */}
-      <div style={{ position: "absolute", top: 0, left: 0, zIndex: 9999, background: "#fff" }}>
-        <Link to="/profile" style={{ color: "red", fontWeight: "bold", padding: 8, display: "inline-block" }}>
-          Test Profile
-        </Link>
-      </div>
+
       <div className="container">
         <div className="header__inner">
           <Link to="/" className="logo">
-            <img src="/assets/images/icon/fahasa-logo.webp" alt="Fahasa Logo" className="logo__icon" />
+            <img src={settings?.logo || "/assets/images/icon/fahasa-logo.webp"} alt="Logo" className="logo__icon" />
           </Link>
           <div className="search">
             <form onSubmit={handleSearch} className="search__form">
