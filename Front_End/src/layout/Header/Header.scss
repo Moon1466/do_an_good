@@ -157,4 +157,11 @@
       background-color: #f5f5f5;
     }
   }
+
+  &__item{
+    & a{
+      display: inline-block;
+      width: 100%;
+    }
+  }
 }

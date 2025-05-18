@@ -26,7 +26,7 @@ const PaymentSuccess = () => {
           </button>
           <button
             className="payment-success__button payment-success__button--outline"
-            onClick={() => navigate("/orders")}>
+            onClick={() => navigate("/order-history")}>
             Xem đơn hàng
           </button>
         </div>

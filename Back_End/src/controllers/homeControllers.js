@@ -2,6 +2,7 @@ const Product = require('../model/Products');
 const Category = require('../model/Categories');
 const Order = require('../model/Orders');
 const User = require('../model/Accounts');
+const Settings = require('../model/Settings');
 
 const getHome = async (req, res) => {
     try {
@@ -160,7 +161,15 @@ const getCategory = async (req, res) => {
       res.status(500).send('Server Error');
     }
   };
-  
+
+const getSetting = async (req, res) => {
+    try {
+        const settings = await Settings.findOne();
+        res.render('setting', { settings });
+    } catch (error) {
+        res.render('setting', { settings: null });
+    }
+}
 
 module.exports = {
     getHome,
@@ -168,5 +177,6 @@ module.exports = {
     getOrder,
     getAccount,
     getComment,
-    getCategory
+    getCategory,
+    getSetting
 }

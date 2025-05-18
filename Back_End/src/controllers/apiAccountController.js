@@ -38,9 +38,11 @@ const login = async (req, res) => {
         res.json({
             success: true,
             account: {
+                _id: account._id,
                 username: account.username,
                 email: account.email,
                 fullName: account.fullName,
+                phone: account.phone,
                 role: account.role,
                 avatar: account.avatar || 'https://res.cloudinary.com/dcqyuixqu/image/upload/v1745775273/logo_user_empty_a971qi.png'
             }
@@ -222,13 +224,17 @@ const updateAccount = async (req, res) => {
             fullName,
             phone,
             role,
-            address: {
-                province: address.province,
-                district: address.district,
-                ward: address.ward,
-                detail: address.detail || ''
-            }
         };
+
+        // Chỉ cập nhật address nếu có gửi lên
+        if (address) {
+            updateData.address = {
+                province: address.province || '',
+                district: address.district || '',
+                ward: address.ward || '',
+                detail: address.detail || ''
+            };
+        }
 
         // Chỉ cập nhật mật khẩu nếu có thay đổi
         if (password) {

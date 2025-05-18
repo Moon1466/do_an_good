@@ -4,16 +4,18 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import Header from "./layout/Header/Header";
 import Footer from "./layout/Footer/Footer";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 const App = () => {
+  const location = useLocation();
+  const hideFooter = location.pathname.startsWith("/payment");
   return (
     <>
       <Header />
       <main>
         <Outlet />
       </main>
-      <Footer />
+      {!hideFooter && <Footer />}
     </>
   );
 };

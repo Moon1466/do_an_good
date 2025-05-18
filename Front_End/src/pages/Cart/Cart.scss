@@ -48,7 +48,6 @@
   &__notice {
     margin-top: 16px;
     font-size: 1.4rem;
-    font-family: "Nunito Sans";
     color: rgb(51, 51, 51);
   }
 
@@ -76,7 +75,6 @@
   &__header-total {
     font-size: 1.5rem;
     font-weight: 600;
-    font-family: "Nunito Sans";
   }
 
   &__header-quantity,
@@ -144,7 +142,6 @@
 
     &__name {
       font-size: 14px;
-      font-family: "Nunito Sans";
       color: #333333;
     }
 
@@ -199,7 +196,8 @@
 
       button {
         background: none;
-        border: none;
+        border: 1px solid #696969;
+        box-shadow: 1px 1px 1px #7e7e7e;
         cursor: pointer;
         padding: 4px;
 
@@ -243,7 +241,6 @@
 
     &__label {
       font-size: 1.56rem;
-      font-family: "Nunito Sans";
       color: rgb(51, 51, 51);
 
       &--bold {
@@ -289,6 +286,13 @@
         cursor: not-allowed;
         pointer-events: none;
       }
+    }
+
+    &__vat {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
     }
   }
 }

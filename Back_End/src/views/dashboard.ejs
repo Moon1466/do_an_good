@@ -60,6 +60,12 @@
                     <span class="dashboard-sidebar__text">Tài khoản</span>
                   </a>
                 </li>
+                <li class="dashboard-sidebar__item">
+                  <a href="/setting" class="dashboard-sidebar__link">
+                    <img src="images/icons/setting.svg" alt="" class="dashboard-sidebar__icon" />
+                    <span class="dashboard-sidebar__text">Cài đặt</span>
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
@@ -175,7 +181,7 @@
                   <tr>
                     <td>#<%= order._id %></td>
                     <td><%= order.customerName %></td>
-                    <td><%= order.items.length %> sản phẩm</td>
+                    <td><%= order.items ? order.items.length : 0 %> sản phẩm</td>
                     <td><%- new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount) %></td>
                     <td>
                       <span class="order-status order-status--<%= order.status.toLowerCase() %>">

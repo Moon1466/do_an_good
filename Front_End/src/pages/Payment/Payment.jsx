@@ -200,11 +200,12 @@ const Payment = () => {
         // Tạo đơn hàng mới
         const orderData = {
           customer: {
+            _id: user?._id,
             name: formData.name,
-            email: user?.email || "", // Lấy email từ cookie user
+            email: user?.email || "",
             phone: formData.phone,
             address: `${formData.details}, ${formData.ward}, ${formData.district}, ${formData.city}`,
-            username: user?.username || "", // Thêm username vào customer
+            username: user?.username || "",
           },
           products: displayedCartItems.map((item) => ({
             productId: item.productId,
@@ -214,10 +215,10 @@ const Payment = () => {
             image: item.productImage,
           })),
           totalAmount: total,
-          paymentMethod: "Tiền mặt", // Đúng enum
-          paymentStatus: "Chưa thanh toán", // Đúng enum
+          paymentMethod: "Tiền mặt",
+          paymentStatus: "Chưa thanh toán",
           status: "Chờ xác nhận",
-          notes: formData.note, // Đúng tên trường
+          notes: formData.note,
         };
 
         const response = await axios.post("/api/orders/create", orderData);
@@ -238,10 +239,10 @@ const Payment = () => {
   };
 
   return (
-    <main>
+    <div>
       <section className="payment">
         <div className="container">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="payment-form">
             <section className="payment-address">
               <div className="payment-address__heading">
                 <h3 className="payment-address__title">Địa chỉ giao hàng</h3>
@@ -469,13 +470,6 @@ const Payment = () => {
                 </div>
               )}
             </section>
-
-            <div className="payment-submit">
-              {addressError && <div style={{ color: "#c92127", marginBottom: 8 }}>{addressError}</div>}
-              <button type="submit" className="payment-submit__button">
-                Đặt hàng
-              </button>
-            </div>
           </form>
         </div>
       </section>
@@ -501,7 +495,7 @@ const Payment = () => {
               <label htmlFor="agree-term">
                 Bằng việc tiến hành Mua hàng, Bạn đã đồng ý với
                 <a href="#" className="payment-checkout-bar__link">
-                  Điều khoản & Điều kiện của Fahasa.com
+                  Điều khoản & Điều kiện của chúng tôi 
                 </a>
               </label>
             </div>
@@ -515,7 +509,7 @@ const Payment = () => {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 };
 

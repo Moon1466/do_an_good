@@ -14,6 +14,7 @@ const { addProduct , getAllProducts, getProductById, updateProductStatus, delete
 const { createAccount, getAllAccounts, getAccountById, updateAccount, deleteAccount, login } = require('../controllers/apiAccountController');
 const apiCommentController = require('../controllers/apiCommentController');
 const basketController = require('../controllers/apiBasketController');
+const apiSettingController = require('../controllers/apiSettingController');
 
 // ------------ Category ------------------- //
 
@@ -80,5 +81,8 @@ routerAPI.post('/comments/:productId', apiCommentController.addProductComment);
 routerAPI.post('/basket/add', basketController.addToBasket);
 routerAPI.get('/basket/:userId', basketController.getBasket);
 routerAPI.delete('/basket/:userId/:productId', basketController.removeFromBasket);
+
+// ------------ Setting ------------------- //
+routerAPI.post('/setting/update', upload.single('logo'), apiSettingController.updateSetting);
 
 module.exports = routerAPI;

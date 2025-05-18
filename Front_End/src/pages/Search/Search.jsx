@@ -117,7 +117,7 @@ const Search = () => {
           </div>
         </aside>
         {/* Main content */}
-        <main className="search-page__main">
+        <section className="search-page__main">
           <div className="search-page__results">
             {loading ? (
               <div className="search-page__loading">Đang tìm kiếm...</div>
@@ -152,7 +152,7 @@ const Search = () => {
               </div>
             )}
           </div>
-        </main>
+        </section>
       </div>
     </div>
   );

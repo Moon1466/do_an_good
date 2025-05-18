@@ -56,7 +56,7 @@ table {
 }
 
 body {
-  background: #e8edf5;
+  background: #f8f8f8;
   min-height: 100vh;
 }
 
@@ -2470,6 +2470,84 @@ select {
 .comment__detail-icon {
   width: 20px;
   height: 20px;
+}
+
+.setting {
+  padding: 40px 40px;
+  background: #fff;
+  min-height: 100vh;
+}
+
+.setting .setting-form__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0a2259;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.setting .setting-form__group {
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setting .setting-form__label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.setting .setting-form__input {
+  padding: 10px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #f8fafc;
+  transition: border 0.2s;
+}
+
+.setting .setting-form__input:focus {
+  border-color: #0085db;
+  outline: none;
+  background: #fff;
+}
+
+.setting .setting-form__logo-preview {
+  margin-top: 8px;
+}
+
+.setting .setting-form__logo-preview img {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #f8fafc;
+  max-width: 120px;
+  max-height: 80px;
+  display: block;
+}
+
+.setting .setting-form__actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.setting .setting-form__submit {
+  background: #0085db;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 12px 36px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.setting .setting-form__submit:hover {
+  background: #005fa3;
 }
 
 /*# sourceMappingURL=main.css.map */

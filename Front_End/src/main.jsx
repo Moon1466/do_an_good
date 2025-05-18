@@ -10,6 +10,7 @@ import Home from "./pages/Home/Home.jsx";
 import VnpayCheckout from "./pages/Payment/VnpayCheckout.jsx";
 import PaymentSuccess from "./pages/Payment/PaymentSuccess.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
+import OrderHistory from "./pages/OrderHistory/OrderHistory.jsx";
 // Import global styles
 import "./styles/index.scss";
 
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/order-history",
+        element: <OrderHistory />,
       },
     ],
   },

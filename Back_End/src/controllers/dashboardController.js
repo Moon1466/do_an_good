@@ -79,7 +79,7 @@ const getDashboardData = async (req, res) => {
         const formattedRecentOrders = recentOrders.map(order => ({
             _id: order._id,
             customerName: order.user ? order.user.fullName : 'Khách vãng lai',
-            items: order.items,
+            items: Array.isArray(order.items) ? order.items : [],
             totalAmount: order.totalAmount,
             status: order.status,
             createdAt: order.createdAt

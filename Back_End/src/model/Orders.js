@@ -7,6 +7,11 @@ const OrderSchema = new mongoose.Schema({
         unique: true
     },
     customer: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Account',
+            required: true
+        },
         name: {
             type: String,
             required: true

@@ -1,5 +1,10 @@
 .payment {
-  padding: 20px 20px 100px;
+  &-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 100px;
+  }
 
   &-address {
     background: #fff;
@@ -253,7 +258,7 @@
 
 .payment-order-review {
   background: #fafafa;
-  padding: 20px;
+  padding: 20px 20px 100px;
   border-radius: 6px;
   margin-bottom: 24px;
 
@@ -307,6 +312,8 @@
   }
 
   &__name {
+    font-size: 1.6rem;
+
     font-weight: 500;
   }
 
@@ -317,6 +324,7 @@
   }
 
   &__price {
+    font-size: 1.6rem;
     font-weight: 500;
   }
 
@@ -327,12 +335,14 @@
   }
 
   &__quantity-cell {
+    font-size: 1.6em;
     text-align: center;
     padding: 8px;
     font-weight: 500;
   }
 
   &__total-cell {
+    font-size: 1.6em;
     text-align: right;
     padding: 8px;
     font-weight: 600;

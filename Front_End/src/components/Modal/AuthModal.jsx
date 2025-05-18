@@ -48,11 +48,13 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
         if (response.data.success) {
           // Lưu thông tin người dùng vào cookie
           const userInfo = {
+            _id: response.data.account._id,
             username: response.data.account.username,
             email: response.data.account.email,
             fullName: response.data.account.fullName,
             role: response.data.account.role,
             avatar: response.data.account.avatar,
+            phone: response.data.account.phone || "",
           };
           Cookies.set("user", JSON.stringify(userInfo), { expires: 7 });
           if (onLoginSuccess) onLoginSuccess(userInfo);
@@ -96,11 +98,13 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
         if (response.data.success) {
           // Lưu thông tin người dùng vào cookie
           const userInfo = {
+            _id: response.data.account._id,
             username: response.data.account.username,
             email: response.data.account.email,
             fullName: response.data.account.fullName,
             role: response.data.account.role,
             avatar: response.data.account.avatar,
+            phone: response.data.account.phone || "",
           };
           Cookies.set("user", JSON.stringify(userInfo), { expires: 7 });
           if (onLoginSuccess) onLoginSuccess(userInfo);

@@ -197,8 +197,12 @@ const Cart = () => {
                   <h3 className="cart-summary__label">Thành tiền</h3>
                   <span className="cart-summary__amout">{subtotal.toLocaleString()} đ</span>
                 </div>
+                <div className="cart-summary__vat">
+                  <h3 className="cart-summary__label">Thuế VAT (10%)</h3>
+                  <span className="cart-summary__amout">{(subtotal * 0.1).toLocaleString()} đ</span>
+                </div>
                 <div className="cart-summary__total">
-                  <h3 className="cart-summary__label cart-summary__label--bold">Tổng tiền(Thuế VAT)</h3>
+                  <h3 className="cart-summary__label cart-summary__label--bold">Tổng tiền (đã gồm VAT)</h3>
                   <span className="cart-summary__amout cart-summary__amout--bold">
                     {(subtotal * 1.1).toLocaleString()} đ
                   </span>

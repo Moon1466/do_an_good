@@ -287,7 +287,7 @@ const ProductDetail = () => {
                   </button>
                 ) : (
                   <span className="comment-reviews__label">
-                    Bạn cần mua và nhận hàng thành công để bình luận, hoặc bạn đã bình luận sản phẩm này rồi.
+                   Bạn cần mua sản phẩm để được đánh giá
                   </span>
                 )}
               </div>
@@ -306,31 +306,35 @@ const ProductDetail = () => {
                 <ul className="comment-content__list">
                   {reviews.map((review, idx) => (
                     <li className="comment-content__item" key={idx}>
-                      <div className="comment-content__user">
+                      <div className="comment-content__left">
                         <span className="comment-content__name">{review.userName}</span>
                         <span className="comment-content__date">
                           {new Date(review.createdAt).toLocaleDateString("vi-VN")}
                         </span>
                       </div>
-                      <div className="comment-content__review">
+                      <div className="comment-content__right">
                         <div className="comment-content__rating">
                           {[...Array(review.rating)].map((_, i) => (
                             <img
                               key={i}
                               src="/src/assets/images/icon/star.svg"
                               alt=""
-                              className="pd-dt-info__rating-star"
+                              className="comment-content__star"
                             />
                           ))}
                         </div>
-                        <div className="comment-content__cmt">{review.comment}</div>
-                        <div className="comment-content__act">
-                          <div className="comment-content__like">
-                            <img src="/assets/images/icon/like.svg" alt="" className="comment-content__icon" />
-                            <div className="comment-content__value">{review.likes || 0}</div>
-                          </div>
+                        <div className="comment-content__body">{review.comment}</div>
+                        <div className="comment-content__footer">
+                          <button className="comment-content__like">
+                            <img src="/assets/images/icon/like.svg" alt="" />
+                            Thích ({review.likes || 0})
+                          </button>
+                          <button className="comment-content__report">
+                            <img src="/assets/images/icon/report.svg" alt="" />
+                            Báo cáo
+                          </button>
                         </div>
-                      </div>
+                    </div>
                     </li>
                   ))}
                 </ul>
@@ -464,15 +468,31 @@ const ProductDetail = () => {
                   </div>
                   {/* Policy */}
                   <div className="pd-dt-policy">
-                    <h4 className="pd-dt-policy__title">Chính sách ưu đãi của ***</h4>
-                    {[1, 2, 3].map((i) => (
+                    <h4 className="pd-dt-policy__title">Chính sách ưu đãi của Fahasa</h4>
+                    {[
+                      {
+                        icon: "/src/assets/images/icon/ico_truck_v2.webp",
+                        title: "Thời gian giao hàng:",
+                        desc: "Giao nhanh và uy tín",
+                      },
+                      {
+                        icon: "/src/assets/images/icon/ico_transfer_v2.webp",
+                        title: "Chính sách đổi trả:",
+                        desc: "Đổi trả miễn phí toàn quốc",
+                      },
+                      {
+                        icon: "/src/assets/images/icon/ico_shop_v2.webp",
+                        title: "Chính sách khách sỉ:",
+                        desc: "Ưu đãi khi mua số lượng lớn",
+                      },
+                    ].map((item, i) => (
                       <div className="pd-dt-policy__note" key={i}>
                         <div className="pd-dt-policy__left">
-                          <img src="/assets/images/icon/ico_truck_v2.webp" alt="" className="pd-dt-policy__icon" />
-                          <span className="pd-dt-policy__bold">Thời gian giao hàng :</span>
+                          <img src={item.icon} alt="" className="pd-dt-policy__icon" />
+                          <span className="pd-dt-policy__bold">{item.title}</span>
                         </div>
                         <div className="pd-dt-policy__right">
-                          <span>Giao nhanh và uy tín</span>
+                          <span>{item.desc}</span>
                           <img src="/assets/images/icon/arrow_right.svg" alt="" className="pd-dt-policy__arrow" />
                         </div>
                       </div>
@@ -491,18 +511,26 @@ const ProductDetail = () => {
                   {/* Details */}
                   <div className="pd-dt-info__details">
                     <ul className="pd-dt-info__list">
-                      <li className="pd-dt-info__item">
-                        Nhà cung cấp: <span className="pd-dt-info__bold">{product?.supplier || "Đang cập nhật"}</span>
-                      </li>
-                      <li className="pd-dt-info__item">
-                        Nhà xuất bản: <span className="pd-dt-info__bold">{product?.publisher || "Đang cập nhật"}</span>
-                      </li>
-                      <li className="pd-dt-info__item">
-                        Tác giả: <span className="pd-dt-info__bold">{product?.author || "Đang cập nhật"}</span>
-                      </li>
-                      <li className="pd-dt-info__item">
-                        Thể loại: <span className="pd-dt-info__bold">{product?.type || "Đang cập nhật"}</span>
-                      </li>
+                      {product?.supplier && product.supplier !== "Đang cập nhật" && (
+                        <li className="pd-dt-info__item">
+                          Nhà cung cấp: <span className="pd-dt-info__bold">{product.supplier}</span>
+                        </li>
+                      )}
+                      {product?.publisher && product.publisher !== "Đang cập nhật" && (
+                        <li className="pd-dt-info__item">
+                          Nhà xuất bản: <span className="pd-dt-info__bold">{product.publisher}</span>
+                        </li>
+                      )}
+                      {product?.author && product.author !== "Đang cập nhật" && (
+                        <li className="pd-dt-info__item">
+                          Tác giả: <span className="pd-dt-info__bold">{product.author}</span>
+                        </li>
+                      )}
+                      {product?.type && product.type !== "Đang cập nhật" && (
+                        <li className="pd-dt-info__item">
+                          Thể loại: <span className="pd-dt-info__bold">{product.type}</span>
+                        </li>
+                      )}
                     </ul>
                   </div>
                   {/* Rating */}
