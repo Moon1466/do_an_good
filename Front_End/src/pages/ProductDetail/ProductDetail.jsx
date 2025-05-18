@@ -16,10 +16,77 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [canReview, setCanReview] = useState(false);
   const [loadingCheck, setLoadingCheck] = useState(true);
-  const [reviews, setReviews] = useState([]);
+
+  // Thêm state để theo dõi thông tin rating từ CommentSection
+  const [productRating, setProductRating] = useState({
+    avgRating: 0,
+    totalReviews: 0,
+  });
+
+  // Callback để nhận thông tin rating từ CommentSection
+  const updateProductRating = React.useCallback((avgRating, totalReviews) => {
+    // Sử dụng hàm setter của useState để tránh phụ thuộc vào productRating hiện tại
+    setProductRating((prev) => {
+      // Nếu không có thay đổi thực sự, trả về đúng object cũ để tránh re-render
+      if (prev.avgRating === avgRating && prev.totalReviews === totalReviews) {
+        return prev;
+      }
+      return { avgRating, totalReviews };
+    });
+  }, []);
+
+  // Memoize các handler để giảm re-render
+  const handleIncrease = React.useCallback(() => {
+    if (quantity < (product?.stock || 1)) {
+      setQuantity((prev) => prev + 1);
+    }
+  }, [quantity, product]);
+
+  const handleDecrease = React.useCallback(() => {
+    if (quantity > 1) {
+      setQuantity((prev) => prev - 1);
+    }
+  }, [quantity]);
+
+  const handleAddToCart = React.useCallback(async () => {
+    let user = null;
+    try {
+      user = JSON.parse(Cookies.get("user"));
+    } catch (e) {
+      alert("Không thể đọc thông tin người dùng. Vui lòng đăng nhập lại!");
+      return;
+    }
+    if (!user || !(user._id || user.username) || !(user.name || user.fullName) || !user.avatar) {
+      alert("Thiếu thông tin người dùng. Vui lòng đăng nhập lại!");
+      return;
+    }
+    const apiUrl = "/api/basket/add";
+    await axios.post(apiUrl, {
+      userId: user._id || user.username,
+      userName: user.name || user.fullName || user.username,
+      userAvatar: user.avatar,
+      productId: product._id,
+      productName: product.name,
+      productImage: product.images[0],
+      quantity,
+      price: product.price,
+    });
+    alert("Đã thêm vào giỏ hàng!");
+  }, [product, quantity]);
+
+  // Memoize breadcrumbItems để tránh tính lại không cần thiết
+  const breadcrumbItems = React.useMemo(() => {
+    if (!product) return [];
+    return [
+      ...categoryBreadcrumbs.map((cat) => ({
+        name: cat.name,
+        path: `/category/${cat.slug}`,
+      })),
+      { name: product?.name },
+    ];
+  }, [categoryBreadcrumbs, product]);
 
   useEffect(() => {
-    console.log("ProductDetail useEffect - id:", id, "slug:", slug);
     const fetchProduct = async () => {
       setLoading(true);
       setError("");
@@ -53,13 +120,10 @@ const ProductDetail = () => {
     setIsLoggedIn(!!userCookie);
 
     const checkCanReview = async () => {
-      console.log("checkCanReview called");
       setLoadingCheck(true);
       try {
         const user = JSON.parse(Cookies.get("user"));
-        console.log("user in checkCanReview", user);
         if (!user || !user.email) {
-          console.log("No user or user.email, cannot review");
           setCanReview(false);
           setLoadingCheck(false);
           return;
@@ -69,19 +133,13 @@ const ProductDetail = () => {
         const allOrders = ordersRes.data.data || [];
         // 2. Lọc đơn hàng có email trùng với user
         const orders = allOrders.filter((order) => order.customer && order.customer.email === user.email);
-        console.log("orders filtered by email", orders);
-        orders.forEach((order) => {
-          console.log("Order status:", order.status);
-          order.products.forEach((p) => {
-            console.log("ProductId in order:", p.productId, "Compare with:", id);
-          });
-        });
+
         // 3. Kiểm tra có đơn hàng đã xác nhận và chứa sản phẩm này không
         const hasPurchased = orders.some(
           (order) =>
             order.status === "Đã xác nhận" && order.products.some((p) => p.productId?.toString() === id?.toString())
         );
-        console.log("hasPurchased", hasPurchased, orders);
+
         if (!hasPurchased) {
           setCanReview(false);
           setLoadingCheck(false);
@@ -90,162 +148,210 @@ const ProductDetail = () => {
         // 4. Lấy tất cả comment của sản phẩm
         const commentsRes = await axios.get(`/api/comments/${id}`);
         const comments = commentsRes.data.comments || [];
-        console.log("comments", comments);
+
         // 5. Kiểm tra user đã từng bình luận chưa (theo email hoặc fullName)
-        const hasReviewed = comments.some((c) => c.userEmail === user.email || c.userName === user.fullName);
-        console.log("hasReviewed", hasReviewed, comments);
-        setCanReview(!hasReviewed);
+        // const hasReviewed = comments.some((c) => c.userEmail === user.email || c.userName === user.fullName);
+        // setCanReview(!hasReviewed);
+        setCanReview(true);
       } catch (e) {
-        console.log("Error in checkCanReview", e);
+        console.error("Error in checkCanReview", e);
         setCanReview(false);
       }
       setLoadingCheck(false);
     };
-    checkCanReview();
+
+    if (id) {
+      checkCanReview();
+    }
   }, [id, slug]);
-
-  // Hàm xử lý tăng số lượng
-  const handleIncrease = () => {
-    if (quantity < (product?.stock || 1)) {
-      setQuantity((prev) => prev + 1);
-    }
-  };
-
-  // Hàm xử lý giảm số lượng
-  const handleDecrease = () => {
-    if (quantity > 1) {
-      setQuantity((prev) => prev - 1);
-    }
-  };
-
-  const handleAddToCart = async () => {
-    let user = null;
-    try {
-      user = JSON.parse(Cookies.get("user"));
-    } catch (e) {
-      alert("Không thể đọc thông tin người dùng. Vui lòng đăng nhập lại!");
-      return;
-    }
-    if (!user || !(user._id || user.username) || !(user.name || user.fullName) || !user.avatar) {
-      alert("Thiếu thông tin người dùng. Vui lòng đăng nhập lại!");
-      return;
-    }
-    const apiUrl = "/api/basket/add";
-    await axios.post(apiUrl, {
-      userId: user._id || user.username,
-      userName: user.name || user.fullName || user.username,
-      userAvatar: user.avatar,
-      productId: product._id,
-      productName: product.name,
-      productImage: product.images[0],
-      quantity,
-      price: product.price,
-    });
-    alert("Đã thêm vào giỏ hàng!");
-  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div style={{ color: "red" }}>{error}</div>;
   if (!product) return <div>Product not found</div>;
 
-  // Breadcrumb chỉ có category là link, tên sản phẩm là text cuối
-  const breadcrumbItems = [
-    ...categoryBreadcrumbs.map((cat) => ({
-      name: cat.name,
-      path: `/category/${cat.slug}`,
-    })),
-    { name: product?.name },
-  ];
+  // Đặt ngoài cùng file và sử dụng React.memo để tránh render không cần thiết
+  const ReviewModal = React.memo(
+    ({ showModal, setShowModal, rating, setRating, comment, setComment, handleSubmitReview, loading }) => {
+      if (!showModal) return null;
 
-  // Comment Section Component
-  const CommentSection = () => {
-    const [showModal, setShowModal] = useState(false);
-    const [rating, setRating] = useState(0);
-    const [comment, setComment] = useState("");
-    const [loading, setLoading] = useState(false);
+      const handleClose = () => {
+        setShowModal(false);
+      };
 
-    useEffect(() => {
-      fetchReviews();
-    }, []);
+      return (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Viết đánh giá sản phẩm</h3>
+              <button onClick={handleClose}>&times;</button>
+            </div>
+            <form onSubmit={handleSubmitReview}>
+              <div className="rating-input">
+                <label>Đánh giá của bạn:</label>
+                <div className="stars" style={{ display: "flex", gap: 4 }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      style={{
+                        cursor: "pointer",
+                        fontSize: 28,
+                        color: rating >= star ? "#FFD700" : "#ccc",
+                        transition: "color 0.2s",
+                      }}
+                      onClick={() => setRating(star)}
+                      role="button"
+                      aria-label={`Đánh giá ${star} sao`}>
+                      ★
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="comment-input">
+                <label>Nhận xét của bạn:</label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Chia sẻ cảm nhận của bạn về sản phẩm này..."
+                  required
+                  style={{ width: "100%", minHeight: 80, resize: "vertical" }}
+                />
+              </div>
+              <div className="modal-footer">
+                <button type="button" onClick={handleClose}>
+                  Hủy
+                </button>
+                <button type="submit" disabled={loading || !rating || !comment}>
+                  {loading ? "Đang gửi..." : "Gửi đánh giá"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+  );
 
-    const fetchReviews = async () => {
+  const CommentSection = React.memo(({ id, canReview, loadingCheck, onRatingUpdate }) => {
+    const [showModal, setShowModal] = React.useState(false);
+    const [rating, setRating] = React.useState(0);
+    const [comment, setComment] = React.useState("");
+    const [loading, setLoading] = React.useState(false);
+
+    // Quản lý state reviews trong component con
+    const [localReviews, setLocalReviews] = React.useState([]);
+
+    // Sử dụng useRef để lưu giá trị trước đó
+    const previousValuesRef = React.useRef({ avgRating: 0, reviewCount: 0 });
+
+    // Tính toán avg rating trong CommentSection
+    const avgRating = React.useMemo(() => {
+      return localReviews.length > 0
+        ? (localReviews.reduce((acc, review) => acc + review.rating, 0) / localReviews.length).toFixed(1)
+        : "0";
+    }, [localReviews]);
+
+    // Cập nhật thông tin rating cho component cha - CHỈ khi localReviews thay đổi
+    React.useEffect(() => {
+      // Rất quan trọng: chỉ gọi onRatingUpdate một lần sau khi fetch reviews
+      if (onRatingUpdate && localReviews.length > 0) {
+        const currentAvg = parseFloat(avgRating);
+        const currentCount = localReviews.length;
+
+        // Chỉ cập nhật khi thực sự có thay đổi
+        if (
+          previousValuesRef.current.avgRating !== currentAvg ||
+          previousValuesRef.current.reviewCount !== currentCount
+        ) {
+          // Cập nhật giá trị tham chiếu
+          previousValuesRef.current = { avgRating: currentAvg, reviewCount: currentCount };
+
+          // Thông báo lên component cha
+          onRatingUpdate(currentAvg, currentCount);
+        }
+      }
+    }, [localReviews, avgRating, onRatingUpdate]);
+
+    // Sử dụng useCallback để hàm này không bị tạo lại mỗi khi component re-render
+    const fetchReviews = React.useCallback(async () => {
       try {
         const response = await axios.get(`/api/comments/${id}`);
         if (response.data.success) {
-          setReviews(response.data.comments || []);
+          setLocalReviews(response.data.comments || []);
         }
       } catch (error) {
         console.error("Error fetching reviews:", error);
       }
-    };
+    }, [id]);
 
-    const handleSubmitReview = async (e) => {
-      e.preventDefault();
-      setLoading(true);
-      try {
-        const user = JSON.parse(Cookies.get("user"));
-        console.log("User data:", user);
-
-        // Validate user data
-        if (!user || !user.email) {
-          alert("Vui lòng đăng nhập để gửi đánh giá!");
-          setLoading(false);
-          return;
-        }
-
-        // Validate review data
-        if (!rating || rating < 1 || rating > 5) {
-          alert("Vui lòng chọn số sao từ 1-5!");
-          setLoading(false);
-          return;
-        }
-
-        if (!comment || comment.trim().length === 0) {
-          alert("Vui lòng nhập nội dung đánh giá!");
-          setLoading(false);
-          return;
-        }
-
-        console.log("Review data:", {
-          userId: user.email,
-          rating,
-          comment,
-        });
-        const productIdToSend = product?._id || id;
-        if (!productIdToSend) {
-          alert("Không xác định được sản phẩm!");
-          setLoading(false);
-          return;
-        }
-        const response = await axios.post(
-          `/api/comments/${productIdToSend}`,
-          {
-            userId: user.email,
-            rating,
-            comment,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get("token")}`,
-            },
-          }
-        );
-
-        if (response.data.success) {
-          setShowModal(false);
-          setRating(0);
-          setComment("");
-          fetchReviews(); // Refresh reviews after submission
-        } else {
-          alert(response.data.message || "Không thể gửi bình luận");
-        }
-      } catch (error) {
-        alert(error.response?.data?.message || "Không thể gửi bình luận");
-        console.error("Error submitting review:", error);
-      } finally {
-        setLoading(false);
+    // Chỉ fetch reviews một lần khi id thay đổi hoặc fetchReviews thay đổi
+    React.useEffect(() => {
+      if (id) {
+        fetchReviews();
       }
-    };
+    }, [id, fetchReviews]);
+
+    const handleSubmitReview = React.useCallback(
+      async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+          const user = JSON.parse(Cookies.get("user"));
+          if (!user || !user.email) {
+            alert("Vui lòng đăng nhập để gửi đánh giá!");
+            setLoading(false);
+            return;
+          }
+          if (!rating || rating < 1 || rating > 5) {
+            alert("Vui lòng chọn số sao từ 1-5!");
+            setLoading(false);
+            return;
+          }
+          if (!comment || comment.trim().length === 0) {
+            alert("Vui lòng nhập nội dung đánh giá!");
+            setLoading(false);
+            return;
+          }
+          const productIdToSend = id;
+          if (!productIdToSend) {
+            alert("Không xác định được sản phẩm!");
+            setLoading(false);
+            return;
+          }
+          const response = await axios.post(
+            `/api/comments/${productIdToSend}`,
+            {
+              userId: user.email,
+              rating,
+              comment,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${Cookies.get("token")}`,
+              },
+            }
+          );
+          if (response.data.success) {
+            setShowModal(false);
+            setRating(0);
+            setComment("");
+            fetchReviews();
+          } else {
+            alert(response.data.message || "Không thể gửi bình luận");
+          }
+        } catch (error) {
+          alert(error.response?.data?.message || "Không thể gửi bình luận");
+          console.error("Error submitting review:", error);
+        } finally {
+          setLoading(false);
+        }
+      },
+      [comment, fetchReviews, id, rating]
+    );
+
+    // Sử dụng useCallback cho handler bấm nút để tránh tạo hàm mới mỗi lần render
+    const handleOpenModal = React.useCallback(() => {
+      setShowModal(true);
+    }, []);
 
     return (
       <section className="comment">
@@ -258,8 +364,10 @@ const ProductDetail = () => {
                 <div className="comment-rating__score-detail">
                   <div className="comment-rating__score">
                     <span className="comment-rating__value">
-                      {reviews.length > 0
-                        ? (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1)
+                      {localReviews.length > 0
+                        ? (localReviews.reduce((acc, review) => acc + review.rating, 0) / localReviews.length).toFixed(
+                            1
+                          )
                         : "0"}
                     </span>
                     <span className="comment-rating__max">/5</span>
@@ -269,12 +377,12 @@ const ProductDetail = () => {
                       <img key={i} src="/src/assets/images/icon/star.svg" alt="" className="pd-dt-info__rating-star" />
                     ))}
                   </div>
-                  <span className="comment-rating__count">({reviews.length} đánh giá)</span>
+                  <span className="comment-rating__count">({localReviews.length} đánh giá)</span>
                 </div>
                 <div className="comment-rating__bars">
                   {[5, 4, 3, 2, 1].map((star) => {
-                    const count = reviews.filter((r) => r.rating === star).length;
-                    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                    const count = localReviews.filter((r) => r.rating === star).length;
+                    const percentage = localReviews.length > 0 ? (count / localReviews.length) * 100 : 0;
                     return (
                       <div className="comment-rating__bar" key={star}>
                         <span className="comment-rating__label">{star} sao</span>
@@ -293,7 +401,7 @@ const ProductDetail = () => {
                 {loadingCheck ? (
                   <span>Đang kiểm tra quyền bình luận...</span>
                 ) : canReview ? (
-                  <button className="comment-reviews__btn" onClick={() => setShowModal(true)}>
+                  <button className="comment-reviews__btn" onClick={handleOpenModal}>
                     Viết bình luận
                   </button>
                 ) : (
@@ -313,7 +421,7 @@ const ProductDetail = () => {
               {/* Content */}
               <div className="comment-content">
                 <ul className="comment-content__list">
-                  {reviews.map((review, idx) => (
+                  {localReviews.map((review, idx) => (
                     <li className="comment-content__item" key={idx}>
                       <div className="comment-content__left">
                         <span className="comment-content__name">{review.userName}</span>
@@ -365,76 +473,12 @@ const ProductDetail = () => {
         />
       </section>
     );
-  };
+  });
 
-  // Tách ReviewModal ra ngoài CommentSection
-  const ReviewModal = ({
-    showModal,
-    setShowModal,
-    rating,
-    setRating,
-    comment,
-    setComment,
-    handleSubmitReview,
-    loading,
-  }) => {
-    if (!showModal) return null;
-    return (
-      <div className="modal-overlay">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h3>Viết đánh giá sản phẩm</h3>
-            <button onClick={() => setShowModal(false)}>&times;</button>
-          </div>
-          <form onSubmit={handleSubmitReview}>
-            <div className="rating-input">
-              <label>Đánh giá của bạn:</label>
-              <div className="stars" style={{ display: "flex", gap: 4 }}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    style={{
-                      cursor: "pointer",
-                      fontSize: 28,
-                      color: rating >= star ? "#FFD700" : "#ccc",
-                      transition: "color 0.2s",
-                    }}
-                    onClick={() => setRating(star)}
-                    role="button"
-                    aria-label={`Đánh giá ${star} sao`}>
-                    ★
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="comment-input">
-              <label>Nhận xét của bạn:</label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Chia sẻ cảm nhận của bạn về sản phẩm này..."
-                required
-                style={{ width: "100%", minHeight: 80, resize: "vertical" }}
-              />
-            </div>
-            <div className="modal-footer">
-              <button type="button" onClick={() => setShowModal(false)}>
-                Hủy
-              </button>
-              <button type="submit" disabled={loading || !rating || !comment}>
-                {loading ? "Đang gửi..." : "Gửi đánh giá"}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
-
-  const avg = reviews.length > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length : 0;
+  // Không cần biến avg nữa vì nó được tính trong CommentSection
 
   return (
-    <div>
+    <div className="product-detail-wrapper">
       {/* Breadcrumb luôn hiển thị, nếu có dữ liệu category */}
       {product && <Breadcrumb items={breadcrumbItems} />}
       <div className="container">
@@ -513,6 +557,7 @@ const ProductDetail = () => {
                   </div>
                 </div>
               </div>
+
               {/* Right */}
               <div className="pd-dt__content">
                 {/* Info */}
@@ -550,23 +595,36 @@ const ProductDetail = () => {
                   <div className="pd-dt-info__rating">
                     {/* Star */}
                     <div className="pd-dt-info__rating-stars">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <img
-                          key={star}
-                          src="/src/assets/images/icon/star.svg"
-                          alt=""
-                          className="pd-dt-info__rating-star"
-                          style={{
-                            filter:
-                              star <= Math.floor(avg)
-                                ? "grayscale(0%) brightness(1) sepia(1) hue-rotate(-20deg) saturate(5) brightness(1.2)"
-                                : "grayscale(100%) brightness(1.5)",
-                          }}
-                        />
-                      ))}
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        let percent = 0;
+                        if (star <= Math.floor(productRating.avgRating)) {
+                          percent = 100;
+                        } else if (
+                          star === Math.floor(productRating.avgRating) + 1 &&
+                          productRating.avgRating % 1 !== 0
+                        ) {
+                          percent = (productRating.avgRating % 1) * 100;
+                        }
+                        return (
+                          <span
+                            key={star}
+                            style={{
+                              display: "inline-block",
+                              width: 24,
+                              height: 24,
+                              background: percent
+                                ? `linear-gradient(90deg, #FFD700 ${percent}%, #ccc ${percent}%)`
+                                : "#ccc",
+                              WebkitMask: "url(/src/assets/images/icon/star.svg) no-repeat center / contain",
+                              mask: "url(/src/assets/images/icon/star.svg) no-repeat center / contain",
+                              marginRight: 2,
+                            }}
+                          />
+                        );
+                      })}
                     </div>
                     {/* Comment */}
-                    <span className="pd-dt-info__comment">(100 đánh giá)</span>
+                    <span className="pd-dt-info__comment">({productRating.totalReviews} đánh giá)</span>
                     {/* Quantity */}
                     <div className="pd-dt-info__quantity">
                       <p>Đã bán</p>
@@ -630,7 +688,8 @@ const ProductDetail = () => {
           </form>
         </section>
       </div>
-      <CommentSection />
+      {/* Tách biệt CommentSection thành một phần riêng biệt để tránh lỗi cấu trúc DOM */}
+      <CommentSection id={id} canReview={canReview} loadingCheck={loadingCheck} onRatingUpdate={updateProductRating} />
     </div>
   );
 };
